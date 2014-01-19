@@ -1,0 +1,16 @@
+wallpicker has the ability to randomize your wallpaper selection
+
+Upon running randomBG.sh, it makes a shuffled list from all the images (files
+for now, actually) in a given folder or checks if one exists, once this list 
+is prepared it takes the first image in the list and sets it as your wallpaper. 
+
+For now it is capable of checking if files and directories exist but it is not
+capable of selecting only viewable images, so make sure the files in the 
+wallpaper location are all suitable images. The default wallpaper location is
+in ~/Pictures/Wallpapers and can be changed using the wallpicker.conf
+
+To have wallpicker select a background for you on a regular interval, use a 
+cron service like cronie and add a line like this to your crontab
+
+# Change background every ten minutes
+*/10 * * * * fully/qualified/install/location/wallpicker/randomBG.sh
