@@ -13,6 +13,7 @@ if [ ! -d "$WallLocation" ]; then
     echo >&2 'Cannot find wallpaper location'
     exit 1
 fi
+WallListFile=$localFolder/walls.shuf
 
 # Create a shuffle file if one does not exist
 if [ ! -f $WallListFile ] || [ "$(head "$WallListFile")" == "" ]; then
