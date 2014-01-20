@@ -14,13 +14,13 @@ if [[ ! -f  $(echo ${file##*:\/\/} | sed s/\'//) ]]; then
 fi
 
 # Determine desktop session and change wallpaper
-if [ "$DESKTOP_SESSION" == 'cinnamon' ]; then
+if [ $(pgrep cinnamon | wc -l) -ne 0 ]; then
     export $(cat /proc/$(pgrep -u `whoami` ^cinnamon | head -n 1)/environ | grep -z DBUS_SESSION_BUS_ADDRESS)
     DISPLAY=:0 GSETTINGS_BACKEND=dconf gsettings set org.cinnamon.desktop.background picture-uri "$file"
-elif [ "$DESKTOP_SESSION" == 'gnome' ]; then
+elif [ $(pgrep gnome | wc -l) -ne 0 ]; then
     export $(cat /proc/$(pgrep -u `whoami` ^gnome-shell | head -n 1)/environ | grep -z DBUS_SESSION_BUS_ADDRESS)
     DISPLAY=:0 GSETTINGS_BACKEND=dconf gsettings set org.gnome.desktop.background picture-uri "$file"
 else
-    echo >&2 'Cannot read for session' $DESKTOP_SESSION
+    echo >&2 "Cannot read for session $DESKTOP_SESSION"
     exit 2
 fi
