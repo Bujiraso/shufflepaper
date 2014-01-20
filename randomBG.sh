@@ -6,7 +6,7 @@
 localFolder="$(cd "$(dirname "$0")" && pwd)"
 
 # Open config file for wallpaper location and shuffled list location
-. $localFolder/wallpicker.conf
+. $localFolder/shufflepaper.conf
 
 # Check that the wallpaper folder is present
 if [ ! -d "$WallLocation" ]; then
