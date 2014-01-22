@@ -1,4 +1,4 @@
-Shufflepaper randomizes your desktop background from a folder of wallpaper images 
+ShufflePaper randomizes your desktop background from a folder of wallpaper images
 
 Upon running randomBG.sh, it makes a shuffled list from all the images (files
 for now, actually) in a given folder or checks if one exists, once this list 
