@@ -19,7 +19,7 @@ WallListFile=$localFolder/walls.shuf
 if [ ! -f $WallListFile ] || [ "$(head "$WallListFile")" == "" ]; then
     (find "$WallLocation" -type f | shuf) > $WallListFile
 else #if one does, then make sure all new pictures are added
-    echo "$(diff <(sort walls.shuf) <(find $WallLocation -type f | sort) | grep $WallLocation | cut -c 1-2 --complement | shuf)" >> $WallListFile
+    echo "$(diff <(sort $WallListFile) <(find $WallLocation -type f | sort) | grep $WallLocation | cut -c 1-2 --complement | shuf)" >> $WallListFile
 fi
 
 # Get first image from the list
