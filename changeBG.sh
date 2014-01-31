@@ -1,23 +1,44 @@
 #!/bin/bash
 # changeBG.sh
-# Changes the wallpaper for the current desktop session. Implemented for Gnome and Cinnamon
+# Changes the wallpaper for the current desktop session. Implemented for Cinnamon, Gnome and Mate
+#  Copyright (C) 2014 Bujiraso
+
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  any later version.
+
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #Check that the file is prefixed by "file://"
 file=$1
-if [[ ! $1 == *file://* ]]; then
-    file=file://"$1"
-fi
+function prefixURI {
+    if [[ ! $1 == *file://* ]]; then
+        file=file://"$file"
+    fi
 
-if [[ ! -f  $(echo ${file##*:\/\/} | sed s/\'//) ]]; then
-    echo >&2 Error: file \"$1\" does not exist
-    exit 1
-fi
+    if [[ ! -f  $(echo ${file##*:\/\/} | sed s/\'//) ]]; then
+        echo >&2 Error: file \"$file\" does not exist
+        exit 1
+    fi
+} 
 
 # Determine desktop session and change wallpaper
 if [ $(pgrep cinnamon | wc -l) -ne 0 ]; then
+    prefixURI
     export $(cat /proc/$(pgrep -u `whoami` ^cinnamon | head -n 1)/environ | grep -z DBUS_SESSION_BUS_ADDRESS)
     DISPLAY=:0 GSETTINGS_BACKEND=dconf gsettings set org.cinnamon.desktop.background picture-uri "$file"
+elif [ $(pgrep mate-session | wc -l) -ne 0 ]; then
+    export $(cat /proc/$(pgrep -u `whoami` ^mate-session | head -n 1)/environ | grep -z DBUS_SESSION_BUS_ADDRESS)
+    DISPLAY=:0 GSETTINGS_BACKEND=dconf gsettings set org.mate.background picture-filename "$file"
 elif [ $(pgrep gnome | wc -l) -ne 0 ]; then
+    prefixURI
     export $(cat /proc/$(pgrep -u `whoami` ^gnome-shell | head -n 1)/environ | grep -z DBUS_SESSION_BUS_ADDRESS)
     DISPLAY=:0 GSETTINGS_BACKEND=dconf gsettings set org.gnome.desktop.background picture-uri "$file"
 else
