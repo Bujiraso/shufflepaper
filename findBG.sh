@@ -16,20 +16,20 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
+url=
 if [ $(pgrep cinnamon | wc -l) -ne 0 ]; then
     url=$(gsettings get org.cinnamon.desktop.background picture-uri | cut -c9- | rev | cut -c2- | rev)
 #    nemo "$url"
-    eog "$url"
 elif [ $(pgrep mate-session | wc -l) -ne 0 ]; then
     url=$(gsettings get org.mate.background picture-filename | cut -c2- | rev | cut -c2- | rev)
 #    caja "$url"
-    eog "$url"
 elif [ $(pgrep gnome | wc -l) -ne 0 ]; then
     url=$(gsettings get org.gnome.desktop.background picture-uri | cut -c9- | rev | cut -c2- | rev)
 #    nautilus "$url"
-    eog "$url"
 else
     echo >&2 "Cannot read for session $DESKTOP_SESSION"
     exit 2
+fi
+if [[ ! "$url" = "" ]]; then
+    eog "$url"
 fi
