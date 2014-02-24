@@ -19,7 +19,7 @@
 #Check that the file is prefixed by "file://"
 file=$1
 function prefixURI {
-    if [[ ! $1 == *file://* ]]; then
+    if [[ ! $file = *"file://"* ]]; then
         file=file://"$file"
     fi
 
