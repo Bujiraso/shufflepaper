@@ -22,36 +22,6 @@ localFolder="$(cd "$(dirname "$0")" && pwd)"
 WallListFile=$localFolder/walls.shuf
 MissingList=$localFolder/walls.missing
 
-# Open config file for wallpaper location
-. $localFolder/shufflepaper.conf
-
-# Check that the wallpaper folder is present
-if [ ! -d "$WallLocation" ]; then
-    echo >&2 'Cannot find wallpaper location'
-    exit 1
-fi
-
-# Create a shuffle file if one does not exist
-if [ ! -f $WallListFile ] || [ "$(head "$WallListFile")" == "" ]; then
-    (find "$WallLocation" -type f | shuf) > $WallListFile
-else 
-    # List the files in the shuffled list that are now missing
-    missing="$(diff <(sort $WallListFile) <(find $WallLocation -type f | sort) | grep \< | cut -c 1-2 --complement)"
-    if [[ ! $missing =~ ^\ ?$ ]]; then # Don't echo empty lines
-        echo "$missing" >> $MissingList
-    fi
-    # Remove any entries of the missing list from the shuffled list (if one exists) 
-    if [ -f $MissingList ]; then 
-        grep -v -f $MissingList $WallListFile > $WallListFile.tmp
-        mv $WallListFile{.tmp,}
-    fi
-    # Update list with new files
-    newFiles=$(diff <(sort $WallListFile) <(find $WallLocation -type f | sort) | grep -v \< | grep $WallLocation | cut -c 1-2 --complement | shuf)
-    if [[ ! $newFiles =~ ^\ ?$ ]];  then
-        echo "$newFiles" >> $WallListFile
-    fi
-fi
-
 # Get first image from the list
 ImagePath=$(head -n1 $WallListFile)
 
