@@ -23,7 +23,7 @@ if [ $(pgrep cinnamon | wc -l) -ne 0 ]; then
 elif [ $(pgrep mate-session | wc -l) -ne 0 ]; then
     url=$(gsettings get org.mate.background picture-filename | cut -c2- | rev | cut -c2- | rev)
 #    caja "$url"
-elif [ $(pgrep gnome | wc -l) -ne 0 ]; then
+elif [ $(pgrep gnome-session | wc -l) -ne 0 ]; then
     url=$(gsettings get org.gnome.desktop.background picture-uri | cut -c9- | rev | cut -c2- | rev)
 #    nautilus "$url"
 else

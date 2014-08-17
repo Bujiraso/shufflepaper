@@ -17,33 +17,41 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# Open config file for wallpaper location
-. $localFolder/shufflepaper.conf
+insDir=`dirname $0`
+conf="$insDir/shufflepaper.conf"
+listFile="$insDir/walls.shuf"
 
 # Check that the wallpaper folder is present
-if [ ! -d "$WallLocation" ]; then
-    echo >&2 'Cannot find wallpaper location'
-    exit 1
-fi
+checkDir() {
+    if [[ "$1" == \#* || "$1" == "" ]]; then
+        return 1
+    fi
+    if [[ ! -d "$1" ]]; then
+        echo >&2 "Cannot find wallpaper location: $1"
+        exit 1
+    fi
+}
 
 # Create a shuffle file if one does not exist
-if [ ! -f $WallListFile ] || [ "$(head "$WallListFile")" == "" ]; then
-    (find "$WallLocation" -type f | shuf) > $WallListFile
+if [ ! -f $listFile ] || [ "$(head "$listFile")" == "" ]; then
+    echo "No wall list found. Creating new wall list"
+    while read wallDir; do
+        checkDir "$wallDir"
+        if [[ $? -ne 0 ]]; then
+            continue
+        fi
+        find "$wallDir" -type f | shuf >> $listFile
+    done < "$conf"
 else
-    # List the files in the shuffled list that are now missing
-    missing="$(diff <(sort $WallListFile) <(find $WallLocation -type f | sort) | grep \< | cut -c 1-2 --complement)"
-    if [[ ! $missing =~ ^\ ?$ ]]; then # Don't echo empty lines
-        echo "$missing" >> $MissingList
-    fi
-    # Remove any entries of the missing list from the shuffled list (if one exists)
-    if [ -f $MissingList ]; then
-        grep -v -f $MissingList $WallListFile > $WallListFile.tmp
-        mv $WallListFile{.tmp,}
-    fi
-    # Update list with new files
-    newFiles=$(diff <(sort $WallListFile) <(find $WallLocation -type f | sort) | grep -v \< | grep $WallLocation | cut -c 1-2 --complement | shuf)
-    if [[ ! $newFiles =~ ^\ ?$ ]];  then
-        echo "$newFiles" >> $WallListFile
-    fi
+    while read wallDir; do
+        checkDir "$wallDir"
+        if [[ $? -ne 0 ]]; then
+            continue
+        fi
+        newFiles=$(diff <(sort "$listFile" | grep "$wallDir") <(find "$wallDir" -type f | sort) | grep -v \< | grep "$wallDir" | cut -c 1-2 --complement | shuf)
+        if [[ ! $newFiles =~ ^\ ?$ ]];  then
+            echo "$newFiles" >> $listFile
+        fi
+    done < "$conf"
 fi
 
