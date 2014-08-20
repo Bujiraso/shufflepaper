@@ -40,8 +40,10 @@ if [ ! -f $listFile ] || [ "$(head "$listFile")" == "" ]; then
         if [[ $? -ne 0 ]]; then
             continue
         fi
-        find "$wallDir" -type f | shuf >> $listFile
+        find "$wallDir" -type f >> $listFile
     done < "$conf"
+    shuf "$listFile" > "$listFile".tmp
+    mv "$listFile"{.tmp,}
 else
     while read wallDir; do
         checkDir "$wallDir"
@@ -54,4 +56,3 @@ else
         fi
     done < "$conf"
 fi
-
