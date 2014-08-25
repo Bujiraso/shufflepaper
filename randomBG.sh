@@ -19,27 +19,27 @@
 
 # Get local folder and files
 localFolder="$(cd "$(dirname "$0")" && pwd)"
-WallListFile=$localFolder/walls.shuf
+listFile=$localFolder/walls.shuf
 MissingList=$localFolder/walls.missing
 
 # Get first image from the list
-ImagePath=$(head -n1 $WallListFile)
+imageURI=$(head -n1 $listFile)
 
 # If it isn't a file then keep iterating, add the missing files to a missing list
-while [ ! -f "$ImagePath" ]; do
-    if [[ ! $ImagePath =~ ^\ ?$ ]]; then #Don't echo empty lines
-        echo $ImagePath >> $MissingList
+while [ ! -f "$imageURI" ]; do
+    if [[ ! $imageURI =~ ^\ ?$ ]]; then #Don't echo empty lines
+        echo $imageURI >> $MissingList
     fi
     # Strip the first line, since it is not a file
-    tail -n +2 $WallListFile >> $WallListFile.tmp
-    mv $WallListFile.tmp $WallListFile
-    ImagePath=$(head -n1 $WallListFile)
+    tail -n +2 $listFile >> $listFile.tmp
+    mv $listFile.tmp $listFile
+    imageURI=$(head -n1 $listFile)
 done
 
 # Move the top item of the shuffle to the bottom
-tail -n +2 $WallListFile >> $WallListFile.tmp
-echo $ImagePath >> $WallListFile.tmp
-mv $WallListFile.tmp $WallListFile
+tail -n +2 $listFile >> $listFile.tmp
+echo $imageURI >> $listFile.tmp
+mv $listFile.tmp $listFile
 
 # Use change script to change the background
-$localFolder/changeBG.sh "$ImagePath"
+$localFolder/changeBG.sh "$imageURI"

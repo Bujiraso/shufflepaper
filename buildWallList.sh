@@ -33,14 +33,14 @@ checkDir() {
 }
 
 # Create a shuffle file if one does not exist
-if [ ! -f $listFile ] || [ "$(head "$listFile")" == "" ]; then
+if [ ! -f "$listFile" ] || [ "$(head "$listFile")" == "" ]; then
     echo "No wall list found. Creating new wall list"
     while read wallDir; do
         checkDir "$wallDir"
         if [[ $? -ne 0 ]]; then
             continue
         fi
-        find "$wallDir" -type f >> $listFile
+        find "$wallDir" -type f >> "$listFile"
     done < "$conf"
     shuf "$listFile" > "$listFile".tmp
     mv "$listFile"{.tmp,}
@@ -52,7 +52,7 @@ else
         fi
         newFiles=$(diff <(sort "$listFile" | grep "$wallDir") <(find "$wallDir" -type f | sort) | grep -v \< | grep "$wallDir" | cut -c 1-2 --complement | shuf)
         if [[ ! $newFiles =~ ^\ ?$ ]];  then
-            echo "$newFiles" >> $listFile
+            echo "$newFiles" >> "$listFile"
         fi
     done < "$conf"
 fi
