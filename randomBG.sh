@@ -22,11 +22,14 @@ localFolder="$(cd "$(dirname "$0")" && pwd)"
 listFile=$localFolder/walls.shuf
 MissingList=$localFolder/walls.missing
 
+# Find any new files
+$localFolder/buildWallList.sh
+
 # Get first image from the list
 imageURI=$(head -n1 $listFile)
 
 # If it isn't a file then keep iterating, add the missing files to a missing list
-while [ ! -f "$imageURI" ]; do
+while [[ ! -f "$imageURI" && ! "$imageURI" == "" ]]; do
     if [[ ! $imageURI =~ ^\ ?$ ]]; then #Don't echo empty lines
         echo $imageURI >> $MissingList
     fi
