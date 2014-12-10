@@ -19,13 +19,14 @@
 #Check that the file is prefixed by "file://"
 file=$1
 function prefixURI {
-    if [[ ! $file = *"file://"* ]]; then
-        file=file://"$file"
-    fi
-
     if [[ ! -f  $(echo ${file##*:\/\/} | sed s/\'//) ]]; then
         echo >&2 Error: file \"$file\" does not exist
         exit 1
+    fi
+
+    if [[ ! "$file" = *"file://"* ]]; then
+        tmp="file://""$(readlink -f "$file")"
+        file="$tmp"
     fi
 } 
 
