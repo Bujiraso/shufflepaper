@@ -19,8 +19,8 @@
 #Check that the file is prefixed by "file://"
 file=$1
 function prefixURI {
-    if [[ ! -f  $(echo ${file##*:\/\/} | sed s/\'//) ]]; then
-        echo >&2 Error: file \"$file\" does not exist
+    if [[ ! -f  "$(echo "${file##*:\/\/}" | sed s/\'//)" ]]; then
+        echo >&2 "Error: file \"$file\" does not exist"
         exit 1
     fi
 
