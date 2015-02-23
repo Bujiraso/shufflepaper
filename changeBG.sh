@@ -16,8 +16,9 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+file="$1"
+
 #Check that the file is prefixed by "file://"
-file=$1
 function prefixURI {
     if [[ ! -f  "$(echo "${file##*:\/\/}" | sed s/^\'// | sed s/\'$//)" ]]; then
         echo >&2 "Error: file \"$file\" does not exist"

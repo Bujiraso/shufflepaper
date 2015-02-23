@@ -23,6 +23,7 @@ cron service like cronie and add a line like this to your crontab
 ##Installation & Usage
 Listed in more detail above
 * Download project (anywhere you like)
-* Set wallpaper location in shufflepaper.conf
+* Set wallpaper location in shufflepaper.conf and move the conf to your $XDG_DATA_HOME
+    * This variable must be set properly in your cron service as well, or the default location will be used
 * Run randomBG.sh (make sure it works)
 * Set up cron or some manner of running the script recurringly

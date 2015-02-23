@@ -17,9 +17,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-insDir=`dirname $0`
-conf="$insDir/shufflepaper.conf"
-listFile="$insDir/walls.shuf"
+conf="${XDG_DATA_HOME:-$HOME/.local/share}/shufflepaper/shufflepaper.conf"
+listFile="${XDG_DATA_HOME:-$HOME/.local/share}/shufflepaper/walls.shuf"
 
 # Check that the wallpaper folder is present
 checkDir() {

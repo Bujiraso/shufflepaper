@@ -18,12 +18,12 @@
 
 
 # Get local folder and files
-localFolder="$(cd "$(dirname "$0")" && pwd)"
-listFile=$localFolder/walls.shuf
-MissingList=$localFolder/walls.missing
+installDir=$(readlink -f "$(dirname "$0")")
+listFile=${XDG_DATA_HOME:-$HOME/.local/share}/shufflepaper/walls.shuf
+MissingList=${XDG_DATA_HOME:-$HOME/.local/share}/shufflepaper/walls.missing
 
 # Find any new files
-$localFolder/buildWallList.sh
+$installDir/buildWallList.sh
 
 # Get first image from the list
 imageURI=$(head -n1 $listFile)
@@ -45,4 +45,4 @@ echo $imageURI >> $listFile.tmp
 mv $listFile.tmp $listFile
 
 # Use change script to change the background
-$localFolder/changeBG.sh "$imageURI"
+$installDir/changeBG.sh "$imageURI"

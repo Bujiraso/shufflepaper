@@ -29,4 +29,4 @@ else
     exit 2
 fi
 
-$(cd "$(dirname "$0")" && pwd)/changeBG.sh "$bg"
+"$(readlink -f "$(dirname "$0")")"/changeBG.sh "$bg"
