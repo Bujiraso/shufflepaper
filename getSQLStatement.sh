@@ -17,7 +17,12 @@ wallDims=~/bin/wallDims
 
 # Function: Get category
 categorize() {
-    echo "$(readlink -f "$1")" | sed 's,.*/\([0-9]\)/.*,\1,'
+    num=$(echo "$(readlink -f "$1")" | sed 's,.*/\([0-9]\)/.*,\1,')
+    if [[ $num =~ ^[0-9]$ ]]; then
+        echo $num
+    else
+        echo $uncategorized
+    fi
 }
 
 isSelected() {
