@@ -1,0 +1,6 @@
+## WORKFLOW
+
+- Add all wallpapers
+- Check for new wallpapers. Add all new walls
+- Check for modified wallpapers. Add all modified wallpapers
+- Check for missing wallpapers. Remove file paths of and unselect all missing
