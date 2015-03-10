@@ -38,7 +38,7 @@ buildInsert(){
     file="$1"
 
     # Insert syntax
-    string="INSERT OR REPLACE INTO Wallpapers VALUES("
+    string="INSERT OR REPLACE INTO Wallpapers(inode, file_path, category, width, height, selected) VALUES("
     # Inode
     string="$string""$(stat "$file" --printf "%i, ")"
     # File path

@@ -13,11 +13,7 @@ CREATE TABLE IF NOT EXISTS Wallpapers  (
   category	INTEGER(+1) 	CHECK (category >= 0),
   width 	INTEGER 	CHECK (width > 0),
   height 	INTEGER 	CHECK (height > 0),
-  selected 	INTEGER(+1) 	CHECK (selected >= 0 AND selected <= 1) NOT NULL ON CONFLICT FAIL
-  );
-
-CREATE TABLE IF NOT EXISTS Metadata (
-  inode		INTEGER		REFERENCES wallpapers(inode) PRIMARY KEY,
+  selected 	INTEGER(+1) 	CHECK (selected >= 0 AND selected <= 1) NOT NULL ON CONFLICT FAIL,
   view_count	INTEGER 	CHECK (view_count >= 0),
   star_rating	INTEGER(+1) 	CHECK (star_rating >= 0),
   user_comments	TEXT,
