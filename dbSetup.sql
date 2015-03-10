@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS Wallpapers  (
   );
 
 CREATE TABLE IF NOT EXISTS Metadata (
-  inode		INTEGER		REFERENCES wallpapers(inode),
+  inode		INTEGER		REFERENCES wallpapers(inode) PRIMARY KEY,
   view_count	INTEGER 	CHECK (view_count >= 0),
   star_rating	INTEGER(+1) 	CHECK (star_rating >= 0),
   user_comments	TEXT,
