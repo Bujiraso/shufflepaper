@@ -25,7 +25,7 @@ echo -n > "$txnFile"
 find "$wallDir" \( -name "*jpg" -o -name "*png" \) -printf "%i\n" | sort > "$tempList"
 
 # Refresh old list from DB
-sqlite3 "$wallDB" "SELECT inode FROM Wallpapers;" > "$inodeList"
+sqlite3 "$wallDB" "SELECT inode FROM Wallpapers;" | sort > "$inodeList"
 
 # If an inode list exists compare with it
 if [[ -f "$inodeList" ]]; then
@@ -33,7 +33,7 @@ if [[ -f "$inodeList" ]]; then
     diff --speed-large-files "$inodeList" "$tempList" | grep [\>\<] > "$diffFile"
 
     # Wallpaper removed condition
-    if grep \< "$diffFile"> /dev/null 2> /dev/null; then
+    if grep \< "$diffFile" > /dev/null 2> /dev/null; then
         while read line; do
              # Compile SQL statement
              string="DELETE FROM Wallpapers WHERE (inode = \"$line\");"
@@ -44,7 +44,12 @@ if [[ -f "$inodeList" ]]; then
     fi
 
     sqlite3 "$wallDB" < "$txnFile"
-    echo "Removed walls" > "$logFile"
+    # On fail: warn and exit
+    if [[ $? -ne 0 ]]; then
+        echo "$me: $(date +%D.%T) Failed to execute transaction" | tee -a $logFile >> /dev/stderr
+        exit 1
+    fi
+    echo > "$txnFile"
 
     # Wallpaper added condition
     if grep \> "$diffFile"> /dev/null 2> /dev/null; then
