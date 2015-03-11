@@ -34,12 +34,16 @@ if [[ -f "$inodeList" ]]; then
 
     # Wallpaper removed condition
     if grep \< "$diffFile" > /dev/null 2> /dev/null; then
+        numRemoved=$(grep \< "$diffFile" | wc -l)
+        count=0
         while read line; do
              # Compile SQL statement
              string="DELETE FROM Wallpapers WHERE (inode = \"$line\");"
              echo $string >> "$txnFile"
-
+             count=$(($count + 1))
+             echo -ne "Removing $count out of $numRemoved\r"
         done <<< "$(grep \< $diffFile | sed 's/^< //')"
+        echo
         change=true
     fi
 
@@ -53,9 +57,14 @@ if [[ -f "$inodeList" ]]; then
 
     # Wallpaper added condition
     if grep \> "$diffFile"> /dev/null 2> /dev/null; then
+        numRemoved=$(grep \> "$diffFile" | wc -l)
+        count=0
         while read line; do
              "$installDir"/getSQLStatement.sh "$line" >> "$txnFile"
+             count=$(($count + 1))
+             echo -ne "Adding $count out of $numRemoved\r"
         done <<< "$(grep \> $diffFile | sed 's/^> //')"
+        echo
         change=true
     fi
 

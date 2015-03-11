@@ -5,7 +5,7 @@
 me=$(basename "$0")
 
 # Check args
-if [[ $# -eq 0 ]]; then
+if [[ "$#" -eq 0 ]]; then
     echo >&2 "$me: Missing args"
     exit 1
 fi
@@ -18,7 +18,7 @@ wallDims=~/bin/wallDims
 # Function: Get category
 categorize() {
     num=$(echo "$(readlink -f "$1")" | sed 's,.*/\([0-9]\)/.*,\1,')
-    if [[ $num =~ ^[0-9]$ ]]; then
+    if [[ "$num" =~ ^[0-9]$ ]]; then
         echo $num
     else
         echo $uncategorized
@@ -46,7 +46,7 @@ buildInsert(){
     # Category
     string="$string""$(categorize "$file"), "
     # Dimensions
-    dims=$("$wallDims" -n "$file")
+    dims=$("$wallDims" -n -f "$file")
     if [[ $? -ne 0 ]]; then
         echo "$me: Failed to build insert for $1" > /dev/stderr
         exit 2
@@ -70,7 +70,7 @@ buildUpdate() {
         # Category
         string="$string""category = $(categorize "$file"), "
         # Dimensions
-        string="$string""width = $("$wallDims" -n "$file" | tr -d '\n' | sed 's/ /, height = /'), "
+        string="$string""width = $("$wallDims" -n -f "$file" | tr -d '\n' | sed 's/ /, height = /'), "
         # Selectedness
         string="$string""selected = $(isSelected "$file") "
         # WHERE syntax
@@ -81,7 +81,7 @@ buildUpdate() {
     echo $string
 }
 
-if [[ $1 =~ ^[0-9]+$ ]]; then # Argument is an inode
+if [[ "$1" =~ ^[0-9]+$ ]]; then # Argument is an inode
     inode="$1"
     # Find file
     file=$(readlink -f "$(find $wallDir -inum $inode)")
