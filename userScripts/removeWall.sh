@@ -2,8 +2,6 @@
 # removeWall.sh
 # Removes a wallpaper by inode or file path
 
-me=$(basename "$0")
-
 # Check args
 if [[ $# -eq 0 ]]; then
     echo "$me: Missing argument. An inode or file path is required."
@@ -11,8 +9,9 @@ if [[ $# -eq 0 ]]; then
 fi
 
 # Setup vars
-. $(dirname $0)/shufflepaperDB.conf
+. ../shufflepaper.DB.conf
 file="$(readlink -f "$1")"
+me=$(basename "$0")
 
 # Compile SQL statement
 string="DELETE FROM Wallpapers WHERE ("

@@ -2,7 +2,7 @@
 # updateWallInDB.sh
 # Updates various modifiable aspects of a wallpaper in the shufflepaperDB
 
-. shufflepaperDB.conf
+. ../shufflepaperDB.conf
 me=$(basename "$0")
 wallURI=$(getWallURI.sh)
 
@@ -69,6 +69,7 @@ Options
   -p           Update the path of the wallpaper
   -s           Update the star rating of the wallpaper
   -t           Update the selection of the wallpaper
+  -u           Edit user comments
   -v           Update the view count of the wallpaper
 EOS
           exit 0
@@ -88,6 +89,11 @@ EOS
                ;;
            esac
            sqlChanges="$sqlChanges"" selected = $sel,"
+          ;;
+        "u")
+          tempFile="/tmp/alterWallInDB.$(date +%s).comments"
+          sqlite
+          vim 
           ;;
         "v")
           if [[ "${OPTARG}" =~ ^[0-9]+$ ]];then
