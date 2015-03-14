@@ -2,7 +2,7 @@
 # updateWallInDB.sh
 # Updates various modifiable aspects of a wallpaper in the shufflepaperDB
 
-. "$(dirname "$(readlink -f $0)")/../shufflepaperDB.conf"
+. "$(dirname "$(readlink -f "$0")")/shufflepaperDB.conf"
 me=$(basename "$0")
 wallURI=$(getWallURI.sh)
 
@@ -31,8 +31,16 @@ if [[ "$#" -ne 0 && -z "$inode" ]]; then
     #exit 4
 fi
 
-while getopts ":c:df:hp:s:t:uv:" opt; do
+while getopts ":a:c:df:hp:s:t:u:v:" opt; do
     case "$opt" in
+        "a")
+           comments="$(sqlite3 "$wallDB" "SELECT user_comments FROM Wallpapers WHERE inode=$inode")"
+           if [[ -z "$sqlChanges" ]]; then
+               comments=","
+           fi
+           comments=",${OPTARG}"
+           sqlChanges="$sqlChanges""user_comments = \"$comments\","
+           ;;
         "c")
            newCategory=${OPTARG}
            trgDir="$(dirname "$wallURI" | sed "s,/[0-9]/,/$newCategory/,")"
@@ -62,6 +70,7 @@ Usage:
 $me [OPTIONS]...
 
 Options
+  -a           Add user comment (appends comma, then argument)
   -c           Update the category of this wallpaper
   -d           Refresh the dimensions of the wallpaper
   -f           Use a given file, not the current wallpaper
@@ -69,7 +78,7 @@ Options
   -p           Update the path of the wallpaper
   -s           Update the star rating of the wallpaper
   -t           Update the selection of the wallpaper
-  -u           Edit user comments
+  -u           Update user comments (use hyphen to edit existing in EDITOR)
   -v           Update the view count of the wallpaper
 EOS
           exit 0
@@ -91,12 +100,16 @@ EOS
            sqlChanges="$sqlChanges"" selected = $sel,"
           ;;
         "u")
-          tempFile="/tmp/alterWallInDB.$(date +%s).comments"
-          sqlite3 "$wallDB" "SELECT user_comments FROM Wallpapers WHERE inode=$inode"
-          vim $tempFile
-          comments=$(cat "$tempFile")
-          sqlChanges="$sqlChanges""user_comments = \"$comments\","
-          ;;
+           if [[ "${OPTARG}" == "-" ]]; then
+               tempFile="/tmp/alterWallInDB.$(date +%s).comments"
+               sqlite3 "$wallDB" "SELECT user_comments FROM Wallpapers WHERE inode=$inode" > $tempFile
+               $EDITOR $tempFile
+               comments=$(cat "$tempFile")
+               sqlChanges="$sqlChanges""user_comments = \"$comments\","
+           else
+               sqlChanges="$sqlChanges""user_comments = \"${OPTARG}\","
+           fi
+           ;;
         "v")
           if [[ "${OPTARG}" =~ ^[0-9]+$ ]];then
               sqlChanges="$sqlChanges"" view_count = ${OPTARG},"
