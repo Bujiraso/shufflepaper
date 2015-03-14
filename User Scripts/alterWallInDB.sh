@@ -2,7 +2,7 @@
 # updateWallInDB.sh
 # Updates various modifiable aspects of a wallpaper in the shufflepaperDB
 
-. ../shufflepaperDB.conf
+. "$(dirname "$(readlink -f $0)")/../shufflepaperDB.conf"
 me=$(basename "$0")
 wallURI=$(getWallURI.sh)
 

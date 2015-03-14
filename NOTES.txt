@@ -1,3 +1,10 @@
+## Todo
+
+inode conflict -> update path
+file conflict -> update inode
+stop harvesting dims on mine()
+update all values on selection
+
 ## WORKFLOW
 
 - Add all wallpapers

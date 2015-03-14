@@ -9,7 +9,7 @@ if [[ $# -eq 0 ]]; then
 fi
 
 # Setup vars
-. ../shufflepaper.DB.conf
+. "$(dirname "$(readlink -f $0)")/../shufflepaperDB.conf"
 file="$(readlink -f "$1")"
 me=$(basename "$0")
 
