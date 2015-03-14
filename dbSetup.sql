@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS Wallpapers  (
   width 	INTEGER 	CHECK (width > 0),
   height 	INTEGER 	CHECK (height > 0),
   selected 	INTEGER(+1) 	CHECK (selected >= 0 AND selected <= 1) NOT NULL ON CONFLICT FAIL,
-  view_count	INTEGER 	CHECK (view_count >= 0),
+  view_count	INTEGER 	CHECK (view_count >= 0) DEFAULT '0',
   star_rating	INTEGER(+1) 	CHECK (star_rating >= 0),
   user_comments	TEXT,
   option	TEXT		REFERENCES PictureOptions(option)

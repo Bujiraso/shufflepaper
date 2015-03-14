@@ -26,7 +26,7 @@ EOS
 done
 
 findWall() {
-    if [[ "$(sqlite3 "$wallDB" 'SELECT count(*) FROM Wallpapers WHERE file_path="$wallURI"')" -eq 0 ]]; then
+    if [[ "$(sqlite3 "$wallDB" "SELECT count(*) FROM Wallpapers WHERE file_path='$wallURI'")" -eq 0 ]]; then
         # File path must need updating
         list=$(ls -li "$wallURI")
         if [[ "$?" -eq 0 ]]; then

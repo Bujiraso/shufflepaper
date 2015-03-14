@@ -24,7 +24,7 @@ while [[ "$count" -le "$#" ]]; do
 done
 
 #Get inode so that if /anything/ else changes we can still update
-inode=$(findWallInDB.sh -n -f "$wallURI" | cut -d\| -f 1)
+inode=$(findWallInDB.sh -n -f "$wallURI" | cut -d ' ' -f 1)
 
 if [[ "$#" -ne 0 && -z "$inode" ]]; then
     echo "Fatal error: no inode"
