@@ -16,13 +16,19 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+me=$(basename "$0")
+if [[ $# -eq 0 ]]; then
+    echo >&2 "$me: No args given."
+    exit 1
+fi
+
 file="$1"
 
 #Check that the file is prefixed by "file://"
 function prefixURI {
     if [[ ! -f  "$(echo "${file##*:\/\/}" | sed s/^\'// | sed s/\'$//)" ]]; then
-        echo >&2 "Error: file \"$file\" does not exist"
-        exit 1
+        echo >&2 "$me: File \"$file\" does not exist"
+        exit 2
     fi
 
     if [[ ! "$file" = *"file://"* ]]; then
@@ -44,6 +50,6 @@ elif [ $(pgrep gnome | wc -l) -ne 0 ]; then
     export $(cat /proc/$(pgrep -u `whoami` ^gnome-shell | head -n 1)/environ | grep -z DBUS_SESSION_BUS_ADDRESS)
     DISPLAY=:0 GSETTINGS_BACKEND=dconf gsettings set org.gnome.desktop.background picture-uri "$file"
 else
-    echo >&2 "Cannot read for session $DESKTOP_SESSION"
-    exit 2
+    echo >&2 "$me: Cannot read for session $DESKTOP_SESSION"
+    exit 3
 fi
