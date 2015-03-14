@@ -24,7 +24,11 @@ EOS
     esac
 done
 
-if [[ -z "$noheader" ]]; then
-    echo "Inode | File Path | Category | Width | Height | Selected | View Count | Star Rating | User Comments | View Option"
-fi
-sqlite3 "$wallDB" "SELECT * FROM Wallpapers WHERE file_path=\"$wallURI\""
+output() {
+    if [[ -z "$noheader" ]]; then
+        echo "Inode|File Path|Category|Width|Height|Selected|View Count|Star Rating|User Comments|View Option"
+    fi
+    sqlite3 "$wallDB" "SELECT * FROM Wallpapers WHERE file_path=\"$wallURI\""
+}
+
+output| column -s\| -t

@@ -31,7 +31,7 @@ if [[ "$#" -ne 0 && -z "$inode" ]]; then
     #exit 4
 fi
 
-while getopts ":c:df:hp:s:t:v:" opt; do
+while getopts ":c:df:hp:s:t:uv:" opt; do
     case "$opt" in
         "c")
            newCategory=${OPTARG}
@@ -92,8 +92,10 @@ EOS
           ;;
         "u")
           tempFile="/tmp/alterWallInDB.$(date +%s).comments"
-          sqlite
-          vim 
+          sqlite3 "$wallDB" "SELECT user_comments FROM Wallpapers WHERE inode=$inode"
+          vim $tempFile
+          comments=$(cat "$tempFile")
+          sqlChanges="$sqlChanges""user_comments = \"$comments\","
           ;;
         "v")
           if [[ "${OPTARG}" =~ ^[0-9]+$ ]];then
@@ -115,7 +117,7 @@ EOS
 done
 
 if [[ ! -z "$sqlChanges" ]]; then
-    sqlStmt="\"UPDATE Wallpapers SET ${sqlChanges%,} WHERE inode=$inode\""
+    sqlStmt="UPDATE Wallpapers SET ${sqlChanges%,} WHERE inode=$inode"
     echo "Running $sqlStmt"
     sqlite3 "$wallDB" "$sqlStmt"
 else
