@@ -12,12 +12,20 @@ if [[ ! -d "$dataDir" ]]; then
 fi
 
 # Set up database
-sqlite3 "$dataDir"/walls.db < "$installDir"/dbSetup.sql
+if [[ ! -f "$wallDB" ]]; then
+    sqlite3 "$wallsDB" < "$installDir"/dbSetup.sql
+else
+    echo "$me: Error - walls.db exists at $wallsDB. Script will not install in place of existing files"
+fi
 
-cat > "$dataDir"/user.conf << EOS
+if [[ ! -f "$userConf" ]]; then
+    cat > "$userConf" << EOS
 #!/bin/bash
 # user.conf
 # Update your wallpaper folder here
 
-wallDir=~/Pictures/Wallpapers
+wallDir=\$HOME/Pictures/Wallpapers
 EOS
+else
+    echo "$me: Error - user configuration exists at $userConf. Script will not install in place of existing files"
+fi
