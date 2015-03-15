@@ -79,7 +79,7 @@ EOS
           else
               case ${OPTARG} in
                   "centered"|"scaled"|"spanned"|"zoom"|"stretched"|"wallpaper")
-                      sqlChanges="sqlChanges"" view_mode =\"${OPTARG}\","
+                      sqlChanges="$sqlChanges"" view_mode =\"${OPTARG}\","
                   ;;
                   *) #Invalid view option
                       echo "$me: Invalid option -${OPTARG}"
