@@ -82,7 +82,7 @@ EOS
                       sqlChanges="$sqlChanges"" view_mode =\"${OPTARG}\","
                   ;;
                   *) #Invalid view option
-                      echo "$me: Invalid option -${OPTARG}"
+                      echo "$me: Invalid picture option ${OPTARG}"
                       exit 7
                   ;;
               esac
@@ -92,13 +92,18 @@ EOS
            sqlChanges="$sqlChanges"" file_path = ${OPTARG},"
           ;;
         "s")
-           sqlChanges="$sqlChanges"" star_rating = ${OPTARG},"
+           if [[ ${OPTARG} =~ ^[1-5]$ ]]; then
+               sqlChanges="$sqlChanges"" star_rating = ${OPTARG},"
+           else
+               echo "$me: Invalid star rating ${OPTARG}"
+               exit 8
+           fi
           ;;
         "t")
            case "${OPTARG}" in
                "0"|"false"|"off"|"f"|"no"|"F"|"unselected") sel=0 ;;
                "1"|"true"|"on"|"t"|"yes"|"T"|"selected") sel=0 ;;
-               *) echo "Invalid option -${OPTARG}"
+               *) echo "$me: Invalid selectedness ${OPTARG}"
                   exit 5
                ;;
            esac
