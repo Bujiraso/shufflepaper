@@ -3,7 +3,7 @@
 # Creates the wallDB
 
 # Vars
-. "$(dirname $0)"/shufflepaper.conf
+. "$(dirname "$0")"/shufflepaper.conf
 me="$(basename "$0")"
 
 # Ensure data directory exists

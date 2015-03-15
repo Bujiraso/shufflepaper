@@ -4,7 +4,7 @@
 # database
 
 # Vars
-. "$(dirname $0)"/shufflepaperDB.conf
+. "$(dirname "$0")"/shufflepaperDB.conf
 me="$(basename "$0")"
 
 diffFile=/tmp/inodeList.diff

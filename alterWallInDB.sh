@@ -4,7 +4,7 @@
 
 . "$(dirname "$(readlink -f "$0")")/shufflepaperDB.conf"
 me=$(basename "$0")
-wallURI=$($HOME/bin/getWallURI.sh)
+wallURI=$("$installDir/User Scripts/"getWallURI.sh)
 
 # The file needs to be asserted first, out of all the arguments
 count=1
@@ -24,7 +24,7 @@ while [[ "$count" -le "$#" ]]; do
 done
 
 #Get inode so that if /anything/ else changes we can still update
-inode=$($HOME/bin/findWallInDB.sh -n -f "$wallURI" | cut -d ' ' -f 1)
+inode=$("$installDir/User Scripts/findWallInDB.sh" -n -f "$wallURI" | cut -d ' ' -f 1)
 
 if [[ "$#" -ne 0 && -z "$inode" ]]; then
     echo "Fatal error: no inode"
@@ -46,7 +46,7 @@ while getopts ":a:c:df:hm:p:s:t:u:v:" opt; do
            sqlChanges="$sqlChanges"" category=$newCategory,"
            ;;
         "d")
-           sqlChanges="$sqlChanges"" width = $(wallDims -n -f "$wallURI" | tr -d '\n' | sed 's/ /, height = /'),"
+           sqlChanges="$sqlChanges"" width = $("$installDir/User Scripts/wallDims.sh" -n -f "$wallURI" | tr -d '\n' | sed 's/ /, height = /'),"
            ;;
         "h")
            cat<<EOS

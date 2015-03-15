@@ -2,7 +2,7 @@
 # findWallInDB.sh
 # Find the current wallpaper in the shufflepaperDB
 
-. "$(dirname "$(readlink -f $0)")/../shufflepaperDB.conf"
+. "$(dirname "$(readlink -f "$0")")"/../shufflepaperDB.conf
 me=$(basename "$0")
 
 wallURI=$($HOME/bin/getWallURI.sh)
