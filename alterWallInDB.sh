@@ -102,7 +102,7 @@ EOS
         "t")
            case "${OPTARG}" in
                "0"|"false"|"off"|"f"|"no"|"F"|"unselected") sel=0 ;;
-               "1"|"true"|"on"|"t"|"yes"|"T"|"selected") sel=0 ;;
+               "1"|"true"|"on"|"t"|"yes"|"T"|"selected") sel=1 ;;
                *) echo "$me: Invalid selectedness ${OPTARG}"
                   exit 5
                ;;
