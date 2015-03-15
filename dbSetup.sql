@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS Wallpapers  (
   view_count	INTEGER 	CHECK (view_count >= 0) DEFAULT '0',
   star_rating	INTEGER(+1) 	CHECK (star_rating >= 0),
   user_comments	TEXT,
-  option	TEXT		REFERENCES PictureOptions(option)
+  view_mode	TEXT		REFERENCES PictureOptions(option)
   );
 
 -- Fill with values

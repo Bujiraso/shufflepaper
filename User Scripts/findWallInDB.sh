@@ -6,8 +6,10 @@
 me=$(basename "$0")
 
 wallURI=$($HOME/bin/getWallURI.sh)
-while getopts ":f:hn" opt; do
+while getopts ":df:hn" opt; do
     case "$opt" in
+        "d") delimiter=true
+           ;;
         "f") wallURI="${OPTARG}"
            ;;
         "h") cat <<EOS
@@ -15,6 +17,7 @@ Usage:
 $me [OPTIONS]
 
 Options:
+    -d         Print with pipe (|) delimiter
     -h         Print this help
     -n         Do not print the header column line
 EOS
@@ -50,5 +53,9 @@ findWall() {
 
 output="$(findWall)"
 if [[ "$?" -eq 0 ]]; then 
-    echo "$output" | column -s\| -t
+    if [[ -z "$delimiter" ]]; then
+        echo "$output" | column -s\| -t
+    else
+        echo "$output"
+    fi
 fi

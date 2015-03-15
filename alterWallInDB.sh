@@ -31,7 +31,7 @@ if [[ "$#" -ne 0 && -z "$inode" ]]; then
     #exit 4
 fi
 
-while getopts ":a:c:df:hp:s:t:u:v:" opt; do
+while getopts ":a:c:df:hm:p:s:t:u:v:" opt; do
     case "$opt" in
         "a")
            comments="$(sqlite3 "$wallDB" "SELECT user_comments FROM Wallpapers WHERE inode=$inode")"
@@ -51,7 +51,7 @@ while getopts ":a:c:df:hp:s:t:u:v:" opt; do
         "h")
            cat<<EOS
 Usage:
-$me [OPTIONS]...
+$me OPTIONS...
 
 Options
   -a           Add user comment (appends comma, then argument)
@@ -59,6 +59,8 @@ Options
   -d           Refresh the dimensions of the wallpaper
   -f           Use a given file, not the current wallpaper
   -h           Display this help message
+  -m           Update the view mode of the wallpaper
+                 (use hyphen to select from options)
   -p           Update the path of the wallpaper
   -s           Update the star rating of the wallpaper
   -t           Update the selection of the wallpaper
@@ -66,6 +68,25 @@ Options
   -v           Update the view count of the wallpaper
 EOS
           exit 0
+          ;;
+        "m")
+          OPTIONS="centered scaled spanned zoom stretched wallpaper"
+          if [[ "${OPTARG}" == - ]]; then
+              select choice in $OPTIONS; do
+                  sqlChanges="$sqlChanges"" view_mode =\"$choice\","
+                  break
+              done
+          else
+              case ${OPTARG} in
+                  "centered"|"scaled"|"spanned"|"zoom"|"stretched"|"wallpaper")
+                      sqlChanges="sqlChanges"" view_mode =\"${OPTARG}\","
+                  ;;
+                  *) #Invalid view option
+                      echo "$me: Invalid option -${OPTARG}"
+                      exit 7
+                  ;;
+              esac
+          fi
           ;;
         "p")
            sqlChanges="$sqlChanges"" file_path = ${OPTARG},"
