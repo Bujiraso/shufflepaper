@@ -4,7 +4,7 @@
 
 . "$(dirname "$(readlink -f "$0")")/shufflepaperDB.conf"
 me=$(basename "$0")
-wallURI=$(getWallURI.sh)
+wallURI=$($HOME/bin/getWallURI.sh)
 
 # The file needs to be asserted first, out of all the arguments
 count=1
@@ -24,7 +24,7 @@ while [[ "$count" -le "$#" ]]; do
 done
 
 #Get inode so that if /anything/ else changes we can still update
-inode=$(findWallInDB.sh -n -f "$wallURI" | cut -d ' ' -f 1)
+inode=$($HOME/bin/findWallInDB.sh -n -f "$wallURI" | cut -d ' ' -f 1)
 
 if [[ "$#" -ne 0 && -z "$inode" ]]; then
     echo "Fatal error: no inode"
@@ -39,27 +39,11 @@ while getopts ":a:c:df:hp:s:t:u:v:" opt; do
                comments=","
            fi
            comments=",${OPTARG}"
-           sqlChanges="$sqlChanges""user_comments = \"$comments\","
+           sqlChanges="$sqlChanges"" user_comments = \"$comments\","
            ;;
         "c")
            newCategory=${OPTARG}
-           trgDir="$(dirname "$wallURI" | sed "s,/[0-9]/,/$newCategory/,")"
-           if [[ ! -d "$trgDir" ]]; then
-               echo "Target directory $trgDir does not exist. Create it?"
-           else
-               moveBG.sh -f "$wallURI" -t "$trgDir" < /dev/tty
-               if [[ ! -f "$wallURI" ]]; then
-                   expectedURI="$trgDir/$(basename "$wallURI")"
-                   if [[ -f "$expectedURI" ]]; then
-                       wallURI="$expectedURI"
-                       sqlChanges="$sqlChanges""file_path=\"$expectedURI\", category=$newCategory,"
-                   else
-                       echo "The wallpaper has been lost."
-                       echo "Please search for it at $wallURI and $expectedURI, or in $trgDir"
-                       exit 9
-                   fi
-               fi
-           fi
+           sqlChanges="$sqlChanges"" category=$newCategory,"
            ;;
         "d")
            sqlChanges="$sqlChanges"" width = $(wallDims -n -f "$wallURI" | tr -d '\n' | sed 's/ /, height = /'),"

@@ -5,7 +5,7 @@
 . "$(dirname "$(readlink -f $0)")/../shufflepaperDB.conf"
 me=$(basename "$0")
 
-wallURI=$(getWallURI.sh)
+wallURI=$($HOME/bin/getWallURI.sh)
 while getopts ":f:hn" opt; do
     case "$opt" in
         "f") wallURI="${OPTARG}"
