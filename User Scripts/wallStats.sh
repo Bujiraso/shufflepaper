@@ -19,6 +19,7 @@ $me [OPTIONS]
 
 Options:
     -d         Print with pipe (|) delimiter
+    -f         Use the given file instead of the current wallpaper
     -h         Print this help
     -n         Do not print the header column line
 EOS
@@ -30,7 +31,7 @@ EOS
 done
 
 findWall() {
-    if [[ "$(sqlite3 "$wallDB" "SELECT count(*) FROM Wallpapers WHERE file_path='$wallURI'")" -eq 0 ]]; then
+    if [[ "$(sqlite3 "$wallDB" 'SELECT count(*) FROM Wallpapers WHERE file_path="'"$wallURI"'"')" -eq 0 ]]; then
         # File path must need updating
         list=$(ls -li "$wallURI")
         if [[ "$?" -eq 0 ]]; then
