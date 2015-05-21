@@ -11,7 +11,7 @@ while getopts ":df:hn" opt; do
     case "$opt" in
         "d") delimiter=true
            ;;
-        "f") wallURI="${OPTARG}"
+        "f") wallURI="$(readlink -f "${OPTARG}")"
            ;;
         "h") cat <<EOS
 Usage:
@@ -32,6 +32,10 @@ done
 
 findWall() {
     if [[ "$(sqlite3 "$wallDB" 'SELECT count(*) FROM Wallpapers WHERE file_path="'"$wallURI"'"')" -eq 0 ]]; then
+        if [[ ! -f "$wallURI" ]]; then
+            # Wall does not exist.
+            exit 1
+        fi
         # File path must need updating
         list=$(ls -li "$wallURI")
         if [[ "$?" -eq 0 ]]; then
@@ -39,13 +43,13 @@ findWall() {
 	    sqlite3 "$wallDB" "UPDATE Wallpapers SET file_path=\"$wallURI\" WHERE inode=$inode"
         fi
         result="$(sqlite3 "$wallDB" "SELECT * FROM Wallpapers WHERE inode=$inode")"
-        if [[ $? -ne 0 ]]; then
+        if [[ -z "$result" ]]; then
             echo "$me: Error finding wallpaper"
             exit 1
         fi
     else
         result="$(sqlite3 "$wallDB" "SELECT * FROM Wallpapers WHERE file_path=\"$wallURI\"")"
-    fi   
+    fi
 
     if [[ -z "$noheader" ]]; then
         echo "Inode|File Path|Category|Width|Height|Selected|View Count|Star Rating|User Comments|View Option"
@@ -54,10 +58,13 @@ findWall() {
 }
 
 output="$(findWall)"
-if [[ "$?" -eq 0 ]]; then 
+ret=$?
+if [[ "$ret" -eq 0 ]]; then
     if [[ -z "$delimiter" ]]; then
         echo "$output" | column -s\| -t
     else
         echo "$output"
     fi
+else
+    exit "$ret"
 fi

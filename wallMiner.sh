@@ -24,7 +24,7 @@ echo -n > "$txnFile"
 # Create new list from files
 find "$wallDir" \( -name "*jpg" -o -name "*png" \) -printf "%i\n" | sort > "$tempList"
 
-# Refresh old list from DB
+# Create inode list from database
 sqlite3 "$wallDB" "SELECT inode FROM Wallpapers;" | sort > "$inodeList"
 
 # If an inode list exists compare with it
@@ -92,6 +92,3 @@ if [[ $? -ne 0 ]]; then
     echo "$me: $(date +%D.%T) Failed to execute transaction" | tee -a $logFile >> /dev/stderr
     exit 1
 fi
-
-# Replace old list with new list, if any exists
-mv "$tempList" "$inodeList"

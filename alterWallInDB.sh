@@ -4,7 +4,7 @@
 
 . "$(dirname "$(readlink -f "$0")")/shufflepaperDB.conf"
 me=$(basename "$0")
-wallURI=$("$installDir/User Scripts/"getWallURI.sh)
+wallURI=$("$HOME/bin/getWallURI.sh")
 
 # The file needs to be asserted first, out of all the arguments
 count=1
@@ -27,8 +27,8 @@ done
 inode=$("$installDir/User Scripts/wallStats.sh" -n -f "$wallURI" | cut -d ' ' -f 1)
 
 if [[ "$#" -ne 0 && -z "$inode" ]]; then
-    echo "Fatal error: no inode"
-    #exit 4
+    echo "Fatal error: no inode" >&2
+    exit 4
 fi
 
 while getopts ":a:c:df:hm:p:s:t:u:v:" opt; do
@@ -82,7 +82,7 @@ EOS
                       sqlChanges="$sqlChanges"" view_mode =\"${OPTARG}\","
                   ;;
                   *) #Invalid view option
-                      echo "$me: Invalid picture option ${OPTARG}"
+                      echo "$me: Invalid picture option ${OPTARG}" >&2
                       exit 7
                   ;;
               esac
@@ -92,10 +92,10 @@ EOS
            sqlChanges="$sqlChanges"" file_path = ${OPTARG},"
           ;;
         "s")
-           if [[ ${OPTARG} =~ ^[1-5]$ ]]; then
+           if [[ "${OPTARG}" =~ ^[1-5]$ || "${OPTARG}" == "NULL" ]]; then
                sqlChanges="$sqlChanges"" star_rating = ${OPTARG},"
            else
-               echo "$me: Invalid star rating ${OPTARG}"
+               echo "$me: Invalid star rating ${OPTARG}" >&2
                exit 8
            fi
           ;;
@@ -103,7 +103,7 @@ EOS
            case "${OPTARG}" in
                "0"|"false"|"off"|"f"|"no"|"F"|"unselected") sel=0 ;;
                "1"|"true"|"on"|"t"|"yes"|"T"|"selected") sel=1 ;;
-               *) echo "$me: Invalid selectedness ${OPTARG}"
+               *) echo "$me: Invalid selectedness ${OPTARG}" >&2
                   exit 5
                ;;
            esac
@@ -129,7 +129,7 @@ EOS
           fi
           ;;
         \?) # Invalid option
-           echo "$me: Invalid option -$OPTARG"
+           echo "$me: Invalid option -$OPTARG" >&2
            exit 1
           ;;
         :)
@@ -141,8 +141,8 @@ done
 
 if [[ ! -z "$sqlChanges" ]]; then
     sqlStmt="UPDATE Wallpapers SET ${sqlChanges%,} WHERE inode=$inode"
-    echo "Running $sqlStmt"
+    echo "$(date +%Y-%m-%d-%T): $me: Running $sqlStmt" >> /tmp/wallpaperScripts.log
     sqlite3 "$wallDB" "$sqlStmt"
 else
-    echo "No changes to make"
+    echo "$(date +%Y-%m-%d-%T): $me: No changes to make" >> /tmp/wallpaperScripts.log
 fi
