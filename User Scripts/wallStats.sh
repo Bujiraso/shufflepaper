@@ -1,9 +1,9 @@
 #!/bin/bash
 # wallStats.sh
-# Find the current wallpaper in the shufflepaperDB and prints its entry to
+# Find the current wallpaper in the shufflepaper and prints its entry to
 # stdout
 
-. "$(dirname "$(readlink -f "$0")")"/../shufflepaperDB.conf
+. "$(dirname "$(readlink -f "$0")")"/../shufflepaper.conf
 me=$(basename "$0")
 
 wallURI=$($HOME/bin/getWallURI.sh)

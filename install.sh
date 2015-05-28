@@ -22,9 +22,10 @@ if [[ ! -f "$userConf" ]]; then
     cat > "$userConf" << EOS
 #!/bin/bash
 # user.conf
-# Update your wallpaper folder here
+# Update your wallpaper folder and random selection qualifiers here
 
 wallDir=\$HOME/Pictures/Wallpapers
+whereClause='selected=1'
 EOS
 else
     echo "$me: Error - user configuration exists at $userConf. Script will not install in place of existing files"

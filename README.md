@@ -1,5 +1,11 @@
-#ShufflePaper v0.3
+#ShufflePaper v0.4
 by Bujiraso, licensed under GPLv3 or later (see COPYING)
+
+## Requirements
+* sqlite3
+
+###### Optional Requirements
+* cronie
 
 ##Description
 ShufflePaper randomizes your desktop background from a folder of wallpaper
@@ -27,3 +33,6 @@ Listed in more detail above
     * This variable must be set properly in your cron service as well, or the default location will be used
 * Run randomBG.sh (make sure it works)
 * Set up cron or some manner of running the script recurringly
+
+## To-Do
+* Update this readme, as it is outdated.
