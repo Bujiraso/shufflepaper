@@ -2,6 +2,7 @@
 by Bujiraso, licensed under GPLv3 or later (see COPYING)
 
 ## Requirements
+* bash (version 3 or higher)
 * sqlite3
 
 ###### Optional Requirements
