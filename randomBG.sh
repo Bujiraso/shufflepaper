@@ -16,8 +16,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# export DBUS_SESSION_BUS_ADDRESS environment variable to access current gnome wallpaper
-export DBUS_SESSION_BUS_ADDRESS=$(grep -z DBUS_SESSION_BUS_ADDRESS "/proc/$(pgrep -u "$(whoami)" ^gnome-shell$)/environ" | cut -d= -f2-)
 me="$(basename "$0")"
 myDir="$(dirname "$(readlink -f "$0")")"
 . "$myDir/shufflepaper.conf"

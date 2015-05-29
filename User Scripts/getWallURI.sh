@@ -22,6 +22,7 @@ if [ $(pgrep cinnamon | wc -l) -ne 0 ]; then
 elif [ $(pgrep mate-session | wc -l) -ne 0 ]; then
     url=$(gsettings get org.mate.background picture-filename | cut -c2- | rev | cut -c2- | rev)
 elif [ $(pgrep gnome | wc -l) -ne 0 ]; then
+    export $(cat /proc/$(pgrep -u `whoami` ^gnome-shell | head -n 1)/environ | grep -z DBUS_SESSION_BUS_ADDRESS)
     urlUncut=$(gsettings get org.gnome.desktop.background picture-uri)
     if [[ "$urlUncut" == "'file://"* || "$urlUncut" == \"file://* ]]; then
         url=$(echo "$urlUncut" | cut -c9- | rev | cut -c2- | rev)
