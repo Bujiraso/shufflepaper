@@ -9,31 +9,18 @@ by Bujiraso, licensed under GPLv3 or later (see COPYING)
 * cronie
 
 ##Description
-ShufflePaper randomizes your desktop background from a folder of wallpaper
-images
+ShufflePaper builds a wallpaper database from a folder of images and is capable of randomsly selecting your desktop wallpaper and managing metadata about your wallpapers.
 
-Upon running randomBG.sh, it makes a shuffled list from all the images (files
-for now, actually) in a given folder or checks if one exists, once this list
-is prepared it takes the first image in the list and sets it as your wallpaper.
+The default wallpaper location is $HOME/Pictures/Wallpapers and can be changed within the shufflepaper.conf in the conf directory
 
-For now it is capable of checking if files and directories exist but it is not
-capable of selecting only viewable images, so make sure the files in the
-wallpaper location are all suitable images. The default wallpaper location is
-in ~/Pictures/Wallpapers and can be changed using the shufflepaper.conf
-
-To have ShufflePaper select a background for you on a regular interval, use a
-cron service like cronie and add a line like this to your crontab
+To have ShufflePaper select a background for you on a regular interval, use a cron service like cronie and add a line like this to your crontab
 
 \# Change background every ten minutes  
 \*/10 * * * * fully/qualified/install/location/randomBG.sh
 
 ##Installation & Usage
-Listed in more detail above
-* Download project (anywhere you like)
-* Set wallpaper location in shufflepaper.conf and move the conf to your $XDG_DATA_HOME
-    * This variable must be set properly in your cron service as well, or the default location will be used
-* Run randomBG.sh (make sure it works)
-* Set up cron or some manner of running the script recurringly
-
-## To-Do
-* Update this readme, as it is outdated.
+* Download the project (extract if necessary)
+* Set wallpaper location in shufflepaper.conf and optionally set XDG_DATA_HOME
+* Run install.sh
+* Run wallMiner.sh to collect all the wallpapers (performance upgrades are planned for future releases)
+* Set up cron to run or manually call randomBG.sh when a new background is desired
