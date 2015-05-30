@@ -1,6 +1,6 @@
 #!/bin/bash
 # updateWallInDB.sh
-# Updates various modifiable aspects of a wallpaper in the shufflepaper
+# Updates various modifiable aspects of a wallpaper in the shufflepaper database
 #  Copyright (C) 2015 Bujiraso
 
 #  This program is free software: you can redistribute it and/or modify
@@ -16,9 +16,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-. "$(dirname "$(readlink -f "$0")")/shufflepaper.conf"
 me=$(basename "$0")
-wallURI=$("$HOME/bin/getWallURI.sh")
+myDir="$(dirname "$(readlink -f "$0")")"
+. "$myDir/shufflepaper.conf"
+wallURI=$("$myDir/getWallURI.sh")
 
 # The file needs to be asserted first, out of all the arguments
 count=1
@@ -153,10 +154,11 @@ EOS
     esac
 done
 
+log="/tmp/wallpaperScripts.log"
 if [[ ! -z "$sqlChanges" ]]; then
     sqlStmt="UPDATE Wallpapers SET ${sqlChanges%,} WHERE inode=$inode"
-    echo "$(date +%Y-%m-%d-%T): $me: Running $sqlStmt" >> /tmp/wallpaperScripts.log
+    echo "$(date +%Y-%m-%d-%T): $me: Running $sqlStmt" >> "$log"
     sqlite3 "$wallDB" "$sqlStmt"
 else
-    echo "$(date +%Y-%m-%d-%T): $me: No changes to make" >> /tmp/wallpaperScripts.log
+    echo "$(date +%Y-%m-%d-%T): $me: No changes to make" >> "$log"
 fi

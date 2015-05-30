@@ -17,10 +17,11 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-. "$(dirname "$(readlink -f "$0")")"/../shufflepaper.conf
 me=$(basename "$0")
+myDir="$(dirname "$(readlink -f "$0")")"
+. "$myDir/../shufflepaper.conf"
 
-wallURI=$($HOME/bin/getWallURI.sh)
+wallURI=$("$myDir/getWallURI.sh")
 while getopts ":df:hn" opt; do
     case "$opt" in
         "d") delimiter=true

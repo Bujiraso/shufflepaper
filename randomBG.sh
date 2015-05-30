@@ -22,13 +22,14 @@ myDir="$(dirname "$(readlink -f "$0")")"
 changeBG="$myDir/User Scripts/changeBG.sh"
 alterWallInDB="$myDir/alterWallInDB.sh"
 
-list=$(sqlite3 "$wallDB" 'SELECT file_path,view_count,view_mode FROM Wallpapers WHERE '"$whereClause"')')
+list=$(sqlite3 "$wallDB" 'SELECT inode,file_path,view_count,view_mode FROM Wallpapers WHERE '"$whereClause"')')
 SAVEIFS=$IFS
 IFS='|'
 result=($(echo "$list" | shuf | head -n 1))
-wall=${result[0]}
-count=${result[1]}
-viewMode=${result[2]}
+inode=${result[0]}
+wall=${result[1]}
+count=${result[2]}
+viewMode=${result[3]}
 IFS=$SAVEIFS
 
 if [[ -z "$wall" ]]; then
@@ -48,11 +49,11 @@ else
             DISPLAY=:0 "$myDir/User Scripts/wallOption.sh" "$viewMode"
         fi
     else
-        location=$(find "$wallDir" -inum "$(sqlite3 "$wallDB" "SELECT inode FROM Wallpapers WHERE file_path=\"$wall\"")")
+        location=$(find "$wallDir" -inum "$inode")
         if [[ -f "$location" ]]; then
             "$changeBG" "$location"
         else
-            "Could not find $wall. Please locate and update the database."
+            "Could not find wallpaper $inode at $wall. Please locate and update the database."
             exit 5
         fi
     fi
