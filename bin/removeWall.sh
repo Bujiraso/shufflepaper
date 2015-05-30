@@ -23,7 +23,7 @@ if [[ $# -eq 0 ]]; then
 fi
 
 # Setup vars
-. "$(dirname "$(readlink -f "$0")")/../shufflepaper.conf"
+. "$(dirname "$(readlink -f "$0")")/../conf/shufflepaper.conf"
 file="$(readlink -f "$1")"
 me=$(basename "$0")
 

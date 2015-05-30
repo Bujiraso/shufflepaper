@@ -18,8 +18,9 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Vars
-. "$(dirname "$0")"/shufflepaper.conf
 me="$(basename "$0")"
+myDir="$(dirname "$0")"
+. "$myDir/../conf/shufflepaper.conf"
 
 diffFile=/tmp/inodeList.diff
 inodeList="$dataDir"/inode.list
@@ -29,7 +30,7 @@ txnFile=/tmp/"$me".txn
 
 # Ensure data directory exists
 if [[ ! -d "$dataDir" ]]; then
-    "$installDir"/install.sh
+    "$myDir"/install.sh
 fi
 
 # Empty transaction file
@@ -74,7 +75,7 @@ if [[ -f "$inodeList" ]]; then
         numRemoved=$(grep \> "$diffFile" | wc -l)
         count=0
         while read line; do
-             "$installDir"/getSQLStatement.sh "$line" >> "$txnFile"
+             "$myDir"/getSQLStatement.sh "$line" >> "$txnFile"
              count=$(($count + 1))
              echo -ne "Adding $count out of $numRemoved\r"
         done <<< "$(grep \> $diffFile | sed 's/^> //')"
@@ -87,7 +88,7 @@ if [[ -f "$inodeList" ]]; then
     # Update backgrounds with modification newer than the wallDB
     while read line; do
         change=true
-        "$installDir"/getSQLStatement.sh "$line" >> "$txnFile"
+        "$myDir"/getSQLStatement.sh "$line" >> "$txnFile"
     done <<< "$(find "$wallDir" -newer "$wallDB" -type f \( -name "*png" -o -name "*jpg" \) -printf "%i\n" | sort)"
 
     if ! "$change"; then
@@ -96,7 +97,7 @@ if [[ -f "$inodeList" ]]; then
 
 else # If no inode list exists, add all wallpapers
     while read line; do
-        "$installDir"/getSQLStatement.sh "$line" >> "$txnFile"
+        "$myDir"/getSQLStatement.sh "$line" >> "$txnFile"
     done <<< "$(cat $tempList)"
 fi
 

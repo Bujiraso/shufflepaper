@@ -51,7 +51,7 @@ case "$arg" in
         export $(cat /proc/$(pgrep -u `whoami` ^gnome-shell | head -n 1)/environ | grep -z DBUS_SESSION_BUS_ADDRESS)
         DISPLAY=:0 gsettings set org.gnome.desktop.background picture-options "$arg"
         if [[ -z "$noUpdate" ]]; then
-            "$(dirname $(readlink -f "$0"))/../alterWallInDB.sh" -m "$arg"
+            "$(dirname $(readlink -f "$0"))/alterWallInDB.sh" -m "$arg"
         fi
     ;;
     *) #Invalid view option

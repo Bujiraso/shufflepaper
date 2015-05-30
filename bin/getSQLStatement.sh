@@ -26,7 +26,7 @@ fi
 
 # Setup vars
 string=""
-. "$(dirname "$0")"/shufflepaper.conf
+. "$(dirname "$0")"/../conf/shufflepaper.conf
 wallDims=~/bin/wallDims.sh
 
 # Function: Get category

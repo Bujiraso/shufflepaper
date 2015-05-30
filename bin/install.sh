@@ -17,7 +17,8 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Vars
-. "$(dirname "$0")"/shufflepaper.conf
+confDir="$(dirname "$0")"/../conf
+. "$confDir/shufflepaper.conf"
 me="$(basename "$0")"
 
 # Ensure data directory exists
@@ -27,7 +28,7 @@ fi
 
 # Set up database
 if [[ ! -f "$wallDB" ]]; then
-    sqlite3 "$wallsDB" < "$installDir"/dbSetup.sql
+    sqlite3 "$wallsDB" < "$confDir"/dbSetup.sql
 else
     echo "$me: Error - walls.db exists at $wallsDB. Script will not install in place of existing files"
 fi

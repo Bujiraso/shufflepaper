@@ -18,8 +18,8 @@
 
 me="$(basename "$0")"
 myDir="$(dirname "$(readlink -f "$0")")"
-. "$myDir/shufflepaper.conf"
-changeBG="$myDir/User Scripts/changeBG.sh"
+. "$myDir/../conf/shufflepaper.conf"
+changeBG="$myDir/changeBG.sh"
 alterWallInDB="$myDir/alterWallInDB.sh"
 
 list=$(sqlite3 "$wallDB" 'SELECT inode,file_path,view_count,view_mode FROM Wallpapers WHERE '"$whereClause"')')
@@ -44,9 +44,9 @@ else
         fi
         "$changeBG" "$wall"
         if [[ -z "$viewMode" ]]; then
-            DISPLAY=:0 "$myDir/User Scripts/wallOption.sh" "scaled"
+            DISPLAY=:0 "$myDir/wallOption.sh" "scaled"
         else
-            DISPLAY=:0 "$myDir/User Scripts/wallOption.sh" "$viewMode"
+            DISPLAY=:0 "$myDir/wallOption.sh" "$viewMode"
         fi
     else
         location=$(find "$wallDir" -inum "$inode")

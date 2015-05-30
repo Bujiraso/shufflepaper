@@ -18,7 +18,7 @@
 
 me=$(basename "$0")
 myDir="$(dirname "$(readlink -f "$0")")"
-. "$myDir/shufflepaper.conf"
+. "$myDir/../conf/shufflepaper.conf"
 wallURI=$("$myDir/getWallURI.sh")
 
 # The file needs to be asserted first, out of all the arguments
@@ -39,7 +39,7 @@ while [[ "$count" -le "$#" ]]; do
 done
 
 #Get inode so that if /anything/ else changes we can still update
-inode=$("$installDir/User Scripts/wallStats.sh" -n -f "$wallURI" | cut -d ' ' -f 1)
+inode=$("$myDir/wallStats.sh" -n -f "$wallURI" | cut -d ' ' -f 1)
 
 if [[ "$#" -ne 0 && -z "$inode" ]]; then
     echo "Fatal error: no inode" >&2
@@ -61,7 +61,7 @@ while getopts ":a:c:df:hm:p:s:t:u:v:" opt; do
            sqlChanges="$sqlChanges"" category=$newCategory,"
            ;;
         "d")
-           sqlChanges="$sqlChanges"" width = $("$installDir/User Scripts/wallDims.sh" -n -f "$wallURI" | tr -d '\n' | sed 's/ /, height = /'),"
+           sqlChanges="$sqlChanges"" width = $("$myDir/wallDims.sh" -n -f "$wallURI" | tr -d '\n' | sed 's/ /, height = /'),"
            ;;
         "h")
            cat<<EOS
@@ -154,7 +154,7 @@ EOS
     esac
 done
 
-log="/tmp/wallpaperScripts.log"
+log="/tmp/shufflepaper.log"
 if [[ ! -z "$sqlChanges" ]]; then
     sqlStmt="UPDATE Wallpapers SET ${sqlChanges%,} WHERE inode=$inode"
     echo "$(date +%Y-%m-%d-%T): $me: Running $sqlStmt" >> "$log"

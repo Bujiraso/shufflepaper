@@ -54,4 +54,4 @@ else
     exit 3
 fi
 
-echo "$(date +%Y-%m-%d-%T): $me: Wallpaper set to $file" >> /tmp/wallpaperScripts.log
+echo "$(date +%Y-%m-%d-%T): $me: Wallpaper set to $file" >> /tmp/shufflepaper.log
