@@ -88,7 +88,7 @@ if [[ -f "$inodeList" ]]; then
         while read line; do
              "$myDir"/getSQLStatement.sh "$line" >> "$txnFile"
              count=$(($count + 1))
-             echo -ne "Adding $count out of $numRemoved\r"
+             echo -ne "Compiling transaction ($count of $numRemoved)\r"
         done <<< "$(grep \> $diffFile | sed 's/^> //')"
         echo
         change=true
@@ -112,9 +112,18 @@ else # If no inode list exists, add all wallpapers
     done <<< "$(cat $tempList)"
 fi
 
-sqlite3 "$wallDB" < "$txnFile"
-# On fail: warn and exit
-if [[ $? -ne 0 ]]; then
-    echo "$me: $(date +%D.%T) Failed to execute transaction" | tee -a $logFile >> /dev/stderr
-    exit 1
+if [[ -s "$txnFile" ]]; then
+    echo "Running update transaction"
+    sqlite3 "$wallDB" < "$txnFile"
+
+    # On fail: warn and exit
+    if [[ $? -ne 0 ]]; then
+        echo "$me: $(date +%D.%T) Failed to execute transaction" | tee -a $logFile >> /dev/stderr
+        exit 1
+    else
+        echo "Transaction complete."
+    fi
+else
+    echo "Nothing to do."
 fi
+exit 0
