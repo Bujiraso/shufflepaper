@@ -22,7 +22,7 @@ myDir="$(dirname "$(readlink -f "$0")")"
 changeBG="$myDir/changeBG.sh"
 alterWallInDB="$myDir/alterWallInDB.sh"
 
-list=$(sqlite3 "$wallDB" 'SELECT inode,file_path,view_count,view_mode FROM Wallpapers WHERE '"$whereClause"')')
+list=$(sqlite3 "$wallDB" 'SELECT inode,file_path,view_count,view_mode FROM Wallpapers WHERE '"$whereClause")
 SAVEIFS=$IFS
 IFS='|'
 result=($(echo "$list" | shuf | head -n 1))
