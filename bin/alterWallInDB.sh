@@ -56,10 +56,6 @@ while getopts ":a:c:df:hm:p:s:t:u:v:" opt; do
            comments=",${OPTARG}"
            sqlChanges="$sqlChanges"" user_comments = \"$comments\","
            ;;
-        "c")
-           newCategory=${OPTARG}
-           sqlChanges="$sqlChanges"" category=$newCategory,"
-           ;;
         "d")
            sqlChanges="$sqlChanges"" width = $("$myDir/wallDims.sh" -n -f "$wallURI" | tr -d '\n' | sed 's/ /, height = /'),"
            ;;
@@ -70,7 +66,6 @@ $me OPTIONS...
 
 Options
   -a           Add user comment (appends comma, then argument)
-  -c           Update the category of this wallpaper
   -d           Refresh the dimensions of the wallpaper
   -f           Use a given file, not the current wallpaper
   -h           Display this help message

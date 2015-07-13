@@ -29,16 +29,6 @@ string=""
 . "$(dirname "$0")"/../conf/shufflepaper.conf
 wallDims=~/bin/wallDims.sh
 
-# Function: Get category
-categorize() {
-    num=$(echo "$(readlink -f "$1")" | sed 's,.*/\([0-9]\)/.*,\1,')
-    if [[ "$num" =~ ^[0-9]$ ]]; then
-        echo $num
-    else
-        echo $uncategorized
-    fi
-}
-
 isSelected() {
     if [[ "$file" == "*/Unselected/*" ]]; then
         echo 0
@@ -52,13 +42,11 @@ buildInsert(){
     file="$1"
 
     # Insert syntax
-    string="INSERT OR REPLACE INTO Wallpapers(inode, file_path, category, width, height, selected) VALUES("
+    string="INSERT OR REPLACE INTO Wallpapers(inode, file_path, width, height, selected) VALUES("
     # Inode
     string="$string""$(stat "$file" --printf "%i, ")"
     # File path
     string="$string""\"$file\", "
-    # Category
-    string="$string""$(categorize "$file"), "
     # Dimensions
     dims=$("$wallDims" -n -f "$file")
     if [[ $? -ne 0 ]]; then
@@ -81,8 +69,6 @@ buildUpdate() {
         string="UPDATE Wallpapers SET "
         # File path
         string="$string""file_path = \"$file\", "
-        # Category
-        string="$string""category = $(categorize "$file"), "
         # Dimensions
         string="$string""width = $("$wallDims" -n -f "$file" | tr -d '\n' | sed 's/ /, height = /'), "
         # Selectedness

@@ -67,7 +67,7 @@ findWall() {
     fi
 
     if [[ -z "$noheader" ]]; then
-        echo "Inode|File Path|Category|Width|Height|Selected|View Count|Star Rating|User Comments|View Option"
+        echo "Inode|File Path|Width|Height|Selected|View Count|Star Rating|User Comments|View Option"
     fi
     echo $result
 }

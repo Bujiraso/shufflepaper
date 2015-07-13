@@ -10,7 +10,6 @@ CREATE TABLE IF NOT EXISTS PictureOptions (
 CREATE TABLE IF NOT EXISTS Wallpapers  (
   inode		INTEGER 	PRIMARY KEY,
   file_path	TEXT 		UNIQUE,
-  category	INTEGER(+1) 	CHECK (category >= 0),
   width 	INTEGER 	CHECK (width > 0),
   height 	INTEGER 	CHECK (height > 0),
   selected 	INTEGER(+1) 	CHECK (selected >= 0 AND selected <= 1) NOT NULL ON CONFLICT FAIL,
