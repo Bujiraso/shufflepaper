@@ -33,6 +33,17 @@ if [[ ! -d "$dataDir" ]]; then
     "$myDir"/install.sh
 fi
 
+# Update all wallpapers that have been modified since last run
+time=$(date +%s)
+timeSince=$(( ($last_updated - $time) / 86400 ))
+while read line; do
+    file=$(sqlite3 "$HOME/.local/share/shufflepaper/walls.db" 'SELECT file_path FROM Wallpapers WHERE inode ='"$line")
+    # Updating dims also checks file path
+    "$myDir/alterWallInDB.sh" -d -f "$file" > "$logFile"
+done <<<"$(find "$wallDir" \( -name "*jpg" -o -name "*png" \) -mtime "$timeSince" -printf "%i\n" | sort)"
+# When finished update lastUpdated time
+sed -i 's/^\(last_updated=\).*$/\1'"$(date +%s)"'/' "$userConf"
+
 # Empty transaction file
 echo -n > "$txnFile"
 

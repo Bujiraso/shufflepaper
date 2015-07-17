@@ -42,8 +42,21 @@ done
 inode=$("$myDir/wallStats.sh" -n -f "$wallURI" | cut -d ' ' -f 1)
 
 if [[ "$#" -ne 0 && -z "$inode" ]]; then
-    echo "Fatal error: no inode" >&2
+    echo "$me: Fatal error: no inode found for $wallURI" >&2
     exit 4
+fi
+
+# If the file path is currently wrong, find the file by inode
+if [[ ! -f "$wallURI" ]]; then
+    newURI="$(find "$wallDir" -inum "$inode")"
+    if [[ -f "$newURI" ]]; then
+        echo "$me: File path $wallURI is incorrect. Using $newURI instead." >&2
+        sqlChanges="$sqlChanges"" file_path=\"$newURI\","
+        wallURI="$newURI"
+    else
+        echo "$me: Cannot find file $file or inode $inode" >&2
+        exit 5
+    fi
 fi
 
 while getopts ":a:c:df:hm:p:s:t:u:v:" opt; do
@@ -57,7 +70,12 @@ while getopts ":a:c:df:hm:p:s:t:u:v:" opt; do
            sqlChanges="$sqlChanges"" user_comments = \"$comments\","
            ;;
         "d")
-           sqlChanges="$sqlChanges"" width = $("$myDir/wallDims.sh" -n -f "$wallURI" | tr -d '\n' | sed 's/ /, height = /'),"
+           dims=($("$myDir/wallDims.sh" -n -f "$wallURI"))
+           if [[ ${dims[0]} -eq 0 || ${dims[1]} -eq 0 ]]; then
+               echo "$me: Cannot get dimensions for $wallURI." >&2
+               exit 6
+           fi
+           sqlChanges="$sqlChanges"" width = ${dims[0]}, height = ${dims[1]},"
            ;;
         "h")
            cat<<EOS
@@ -93,7 +111,7 @@ EOS
                   ;;
                   *) #Invalid view option
                       echo "$me: Invalid picture option ${OPTARG}" >&2
-                      exit 7
+                      exit 8
                   ;;
               esac
           fi
@@ -106,7 +124,7 @@ EOS
                sqlChanges="$sqlChanges"" star_rating = ${OPTARG},"
            else
                echo "$me: Invalid star rating ${OPTARG}" >&2
-               exit 8
+               exit 10
            fi
           ;;
         "t")
@@ -114,7 +132,7 @@ EOS
                "0"|"false"|"off"|"f"|"no"|"F"|"unselected") sel=0 ;;
                "1"|"true"|"on"|"t"|"yes"|"T"|"selected") sel=1 ;;
                *) echo "$me: Invalid selectedness ${OPTARG}" >&2
-                  exit 5
+                  exit 7
                ;;
            esac
            sqlChanges="$sqlChanges"" selected = $sel,"
@@ -134,8 +152,8 @@ EOS
           if [[ "${OPTARG}" =~ ^[0-9]+$ ]];then
               sqlChanges="$sqlChanges"" view_count = ${OPTARG},"
           else
-              echo "Cannot update view count on non-integer." >&2
-              exit 6
+              echo "$me: Cannot update view count on non-integer." >&2
+              exit 9
           fi
           ;;
         \?) # Invalid option
@@ -154,6 +172,9 @@ if [[ ! -z "$sqlChanges" ]]; then
     sqlStmt="UPDATE Wallpapers SET ${sqlChanges%,} WHERE inode=$inode"
     echo "$(date +%Y-%m-%d-%T): $me: Running $sqlStmt" >> "$log"
     sqlite3 "$wallDB" "$sqlStmt"
+    if [[ $? -ne 0 ]]; then
+        echo "$me: Errors occurred updating $wallURI while running $sqlStmt" > >(tee "$log" >&2)
+    fi
 else
     echo "$(date +%Y-%m-%d-%T): $me: No changes to make" >> "$log"
 fi

@@ -41,6 +41,7 @@ if [[ ! -f "$userConf" ]]; then
 
 wallDir=\$HOME/Pictures/Wallpapers
 whereClause='selected=1'
+last_updated=
 EOS
 else
     echo "$me: Error - user configuration exists at $userConf. Script will not install in place of existing files"
