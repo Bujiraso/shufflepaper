@@ -33,10 +33,17 @@ if [[ ! -d "$dataDir" ]]; then
     "$myDir"/install.sh
 fi
 
+# Create inode list from database
+sqlite3 "$wallDB" "SELECT inode FROM Wallpapers;" | sort > "$inodeList"
+
 # Update all wallpapers that have been modified since last run
 time=$(date +%s)
 timeSince=$(( ($last_updated - $time) / 86400 ))
 while read line; do
+    # If the inode is not present in the database, skip it, it will be added later
+    if ! grep "$line" "$inodeList" > /dev/null; then
+        continue
+    fi
     file=$(sqlite3 "$HOME/.local/share/shufflepaper/walls.db" 'SELECT file_path FROM Wallpapers WHERE inode ='"$line")
     # Updating dims also checks file path
     "$myDir/alterWallInDB.sh" -d -f "$file" > "$logFile"
@@ -49,9 +56,6 @@ echo -n > "$txnFile"
 
 # Create new list from files
 find "$wallDir" \( -name "*jpg" -o -name "*png" \) -printf "%i\n" | sort > "$tempList"
-
-# Create inode list from database
-sqlite3 "$wallDB" "SELECT inode FROM Wallpapers;" | sort > "$inodeList"
 
 # If an inode list exists compare with it
 if [[ -f "$inodeList" ]]; then
