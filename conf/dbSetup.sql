@@ -1,4 +1,3 @@
--- Delete existing table
 PRAGMA foreign_keys = ON;
 
 -- Create PictureOptions enum table

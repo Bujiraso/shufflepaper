@@ -173,7 +173,7 @@ if [[ ! -z "$sqlChanges" ]]; then
     echo "$(date +%Y-%m-%d-%T): $me: Running $sqlStmt" >> "$log"
     sqlite3 "$wallDB" "$sqlStmt"
     if [[ $? -ne 0 ]]; then
-        echo "$me: Errors occurred updating $wallURI while running $sqlStmt" > >(tee "$log" >&2)
+        echo "$me: Errors occurred updating $wallURI while running $sqlStmt" > >(tee -a "$log" >&2)
     fi
 else
     echo "$(date +%Y-%m-%d-%T): $me: No changes to make" >> "$log"
