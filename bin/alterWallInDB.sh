@@ -79,8 +79,7 @@ while getopts ":a:c:df:hm:p:s:t:u:v:" opt; do
            ;;
         "h")
            cat<<EOS
-Usage:
-$me OPTIONS...
+Usage: $me OPTIONS...
 
 Options
   -a           Add user comment (appends comma, then argument)

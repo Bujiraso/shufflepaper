@@ -29,8 +29,7 @@ while getopts ":df:hn" opt; do
         "f") wallURI="$(readlink -f "${OPTARG}")"
            ;;
         "h") cat <<EOS
-Usage:
-$me [OPTIONS]
+Usage: $me [OPTIONS]
 
 Options:
     -d         Print with pipe (|) delimiter
