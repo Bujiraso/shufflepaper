@@ -20,6 +20,7 @@ me=$(basename "$0")
 myDir="$(dirname "$(readlink -f "$0")")"
 . "$myDir/../conf/shufflepaper.conf"
 wallURI=$("$myDir/getWallURI.sh")
+log="/tmp/shufflepaper.log"
 
 # The file needs to be asserted first, out of all the arguments
 count=1
@@ -166,7 +167,6 @@ EOS
     esac
 done
 
-log="/tmp/shufflepaper.log"
 if [[ ! -z "$sqlChanges" ]]; then
     sqlStmt="UPDATE Wallpapers SET ${sqlChanges%,} WHERE inode=$inode"
     echo "$(date +%Y-%m-%d-%T): $me: Running $sqlStmt" >> "$log"

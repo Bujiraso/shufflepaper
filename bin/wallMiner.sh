@@ -24,7 +24,7 @@ myDir="$(dirname "$0")"
 
 diffFile=/tmp/inodeList.diff
 inodeList="$dataDir"/inode.list
-logFile=/tmp/"$me".log
+logFile=/tmp/shufflepaper.log
 tempList="/tmp/inode.list"
 txnFile=/tmp/"$me".txn
 
@@ -40,13 +40,17 @@ sqlite3 "$wallDB" "SELECT inode FROM Wallpapers;" | sort > "$inodeList"
 time=$(date +%s)
 timeSince=$(( ($last_updated - $time) / 86400 ))
 while read line; do
+    # Skip empty lines
+    if [[ -z "$line" ]]; then
+        continue
+    fi
     # If the inode is not present in the database, skip it, it will be added later
     if ! grep "$line" "$inodeList" > /dev/null; then
         continue
     fi
     file=$(sqlite3 "$HOME/.local/share/shufflepaper/walls.db" 'SELECT file_path FROM Wallpapers WHERE inode ='"$line")
     # Updating dims also checks file path
-    "$myDir/alterWallInDB.sh" -d -f "$file" > "$logFile"
+    "$myDir/alterWallInDB.sh" -d -f "$file"
 done <<<"$(find "$wallDir" \( -name "*jpg" -o -name "*png" \) -mtime "$timeSince" -printf "%i\n" | sort)"
 # When finished update lastUpdated time
 sed -i 's/^\(last_updated=\).*$/\1'"$(date +%s)"'/' "$userConf"
@@ -77,13 +81,15 @@ if [[ -f "$inodeList" ]]; then
         change=true
     fi
 
-    sqlite3 "$wallDB" < "$txnFile"
-    # On fail: warn and exit
-    if [[ $? -ne 0 ]]; then
-        echo "$me: $(date +%D.%T) Failed to execute transaction" | tee -a $logFile >> /dev/stderr
-        exit 1
+    if [[ -s "$txnFile" ]]; then
+        sqlite3 "$wallDB" < "$txnFile"
+        echo > "$txnFile"
+        # If deletion fails, don't press on -- user needs to work it out
+        if [[ $? -ne 0 ]]; then
+            echo "$me: $(date +%D.%T) Failed to execute transaction" | tee -a $logFile >> /dev/stderr
+            exit 1
+        fi
     fi
-    echo > "$txnFile"
 
     # Wallpaper added condition
     if grep \> "$diffFile"> /dev/null 2> /dev/null; then
@@ -130,4 +136,6 @@ if [[ -s "$txnFile" ]]; then
 else
     echo "Nothing to do."
 fi
+
+rm "$txnFile"
 exit 0
