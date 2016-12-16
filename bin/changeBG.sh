@@ -40,14 +40,14 @@ function prefixURI {
 # Determine desktop session and change wallpaper
 if [ $(pgrep cinnamon | wc -l) -ne 0 ]; then
     prefixURI
-    export $(cat /proc/$(pgrep -u `whoami` ^cinnamon | head -n 1)/environ | grep -z DBUS_SESSION_BUS_ADDRESS)
+    export $(cat /proc/$(pgrep -u `whoami` ^cinnamon | head -n 1)/environ | grep -z DBUS_SESSION_BUS_ADDRESS | tr -d \\0)
     DISPLAY=:0 gsettings set org.cinnamon.desktop.background picture-uri "$file"
 elif [ $(pgrep mate-session | wc -l) -ne 0 ]; then
-    export $(cat /proc/$(pgrep -u `whoami` ^mate-session | head -n 1)/environ | grep -z DBUS_SESSION_BUS_ADDRESS)
+    export $(cat /proc/$(pgrep -u `whoami` ^mate-session | head -n 1)/environ | grep -z DBUS_SESSION_BUS_ADDRESS | tr -d \\0)
     DISPLAY=:0 gsettings set org.mate.background picture-filename "$file"
 elif [ $(pgrep gnome | wc -l) -ne 0 ]; then
     prefixURI
-    export "$(cat /proc/$(pgrep -u `whoami` ^gnome-shell | head -n 1)/environ | grep -z DBUS_SESSION_BUS_ADDRESS)"
+    export "$(cat /proc/$(pgrep -u `whoami` ^gnome-shell | head -n 1)/environ | grep -z DBUS_SESSION_BUS_ADDRESS | tr -d \\0)"
     DISPLAY=:0 gsettings set org.gnome.desktop.background picture-uri "$file"
 else
     echo >&2 "$me: Cannot read for session $DESKTOP_SESSION"
