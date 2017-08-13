@@ -37,11 +37,6 @@ if [[ -z "$wall" ]]; then
     exit 1
 else
     if [[ -f "$wall" ]]; then
-        if [[ ! "$wall" =~ .*/$mode/.* ]]; then
-            echo "$me: Error. Wallpaper $wall is miscategorized as $mode."
-            "$(readlink -f "$0")" "$*"
-            exit 4
-        fi
         "$changeBG" "$wall"
         if [[ -z "$viewMode" ]]; then
             DISPLAY=:0 "$myDir/wallOption.sh" "scaled"
