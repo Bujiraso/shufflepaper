@@ -1,4 +1,4 @@
-#ShufflePaper v0.4
+# ShufflePaper v0.4
 by Bujiraso, licensed under GPLv3 or later (see COPYING)
 
 ## Requirements
@@ -8,17 +8,19 @@ by Bujiraso, licensed under GPLv3 or later (see COPYING)
 ###### Optional Requirements
 * cronie
 
-##Description
+## Description
 ShufflePaper builds a wallpaper database from a folder of images and is capable of randomly selecting your desktop wallpaper and managing metadata about your wallpapers.
 
 The default wallpaper location is $HOME/Pictures/Wallpapers and can be changed within the shufflepaper.conf in the conf directory
 
 To have ShufflePaper select a background for you on a regular interval, use a cron service like cronie and add a line like this to your crontab
 
-\# Change background every ten minutes  
-\*/10 * * * * fully/qualified/install/location/randomBG.sh
+```bash
+# Change background every ten minutes
+*/10 * * * * fully/qualified/install/location/randomBG.sh
+```
 
-##Installation & Usage
+## Installation & Usage
 * Download the project (extract if necessary)
 * Set wallpaper location in shufflepaper.conf and optionally set XDG_DATA_HOME
 * Run install.sh
