@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # createWallDB.sh
 # Creates the wallDB
-#  Copyright (C) 2015 Bujiraso
+#  Copyright (C) 2015 - 2017 Bujiraso
 
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ fi
 
 if [[ ! -f "$userConf" ]]; then
     cat > "$userConf" << EOS
-#!/bin/bash
+#!/usr/bin/env bash
 # user.conf
 # Update your wallpaper folder and random selection qualifiers here
 

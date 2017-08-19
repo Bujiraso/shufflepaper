@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # wallStats.sh
 # Find the current wallpaper in the shufflepaper and prints its entry to
 # stdout
-#  Copyright (C) 2015 Bujiraso
+#  Copyright (C) 2015 - 2017 Bujiraso
 
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by

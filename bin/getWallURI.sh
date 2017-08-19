@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # getWallURI.sh
 # Gets the location of the current wallpaper without all the garbage
-#  Copyright (C) 2015 Bujiraso
+#  Copyright (C) 2015 - 2017 Bujiraso
 
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by

@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # updateWallInDB.sh
 # Updates various modifiable aspects of a wallpaper in the shufflepaper database
-#  Copyright (C) 2015 Bujiraso
+#  Copyright (C) 2015 - 2017 Bujiraso
 
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
