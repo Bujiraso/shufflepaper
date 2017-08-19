@@ -16,7 +16,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-me=$(basename "$0")
+me=$(basename "${0}")
 
 while getopts ":f:hnr" opt; do
     case "${opt}" in
@@ -53,7 +53,7 @@ fi
 
 if [[ "${wall}" == *"png" ]]; then
     info=($(file "${wall}" 2> /dev/null | sed 's/^.*PNG image data, //' | sed 's/,.*$//' | sed 's/ x//'))
-    if [[ $? -ne 0 ]]; then
+    if [[ ${?} -ne 0 ]]; then
         echo "${me}: Invalid image file \"${wall}\""> /dev/stderr
         exit 2
     fi
@@ -61,7 +61,7 @@ if [[ "${wall}" == *"png" ]]; then
     height=${info[1]}
 elif [[ "${wall}" == *"gif" ]]; then
     info=($(file "${wall}" 2> /dev/null | sed 's/^.*GIF image data, //' | sed 's/,.*$//' | sed 's/ x//'))
-    if [[ $? -ne 0 ]]; then
+    if [[ ${?} -ne 0 ]]; then
         echo "${me}: Invalid image file \"${wall}\""> /dev/stderr
         exit 3
     fi
@@ -69,7 +69,7 @@ elif [[ "${wall}" == *"gif" ]]; then
     height=${info[2]}
 else # JPG case
 	info=($(file -P name=50 "${wall}" | rev | cut -d, -f 2 | tr -d '[[:space:]]' | rev | sed 's/x/ /' ))
-    if [[ $? -ne 0 ]]; then
+    if [[ ${?} -ne 0 ]]; then
         echo "${me}: Invalid image file \"${wall}\""> /dev/stderr
         exit 4
     fi

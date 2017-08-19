@@ -24,15 +24,15 @@ elif [ $(pgrep mate-session | wc -l) -ne 0 ]; then
 elif [ $(pgrep gnome | wc -l) -ne 0 ]; then
     export $(cat /proc/$(pgrep -u $(whoami) ^gnome-shell$ | head -n 1)/environ | grep -z DBUS_SESSION_BUS_ADDRESS | tr -d \\0)
     urlUncut=$(gsettings get org.gnome.desktop.background picture-uri)
-    if [[ "$urlUncut" == "'file://"* || "$urlUncut" == \"file://* ]]; then
-        url=$(echo "$urlUncut" | cut -c9- | rev | cut -c2- | rev)
-    elif [[ "$urlUncut" == \'* ]]; then
-        url="$(echo "$urlUncut" | cut -c2- | rev | cut -c2- | rev)"
+    if [[ "${urlUncut}" == "'file://"* || "${urlUncut}" == \"file://* ]]; then
+        url=$(echo "${urlUncut}" | cut -c9- | rev | cut -c2- | rev)
+    elif [[ "${urlUncut}" == \'* ]]; then
+        url="$(echo "${urlUncut}" | cut -c2- | rev | cut -c2- | rev)"
     else
-        url="$urlUncut"
+        url="${urlUncut}"
     fi
 else
-    echo >&2 "Cannot read for session $DESKTOP_SESSION"
+    echo >&2 "Cannot read for session ${DESKTOP_SESSION}"
     exit 2
 fi
-echo "$url"
+echo "${url}"

@@ -17,32 +17,32 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Vars
-confDir="$(dirname "$0")"/../conf
-. "$confDir/shufflepaper.conf"
-me="$(basename "$0")"
+confDir="$(dirname "${0}")"/../conf
+. "${confDir}/shufflepaper.conf"
+me="$(basename "${0}")"
 
 # Ensure data directory exists
-if [[ ! -d "$dataDir" ]]; then
-    mkdir -p "$dataDir"
+if [[ ! -d "${dataDir}" ]]; then
+    mkdir -p "${dataDir}"
 fi
 
 # Set up database
-if [[ ! -f "$wallDB" ]]; then
-    sqlite3 "$wallsDB" < "$confDir"/dbSetup.sql
+if [[ ! -f "${wallDB}" ]]; then
+    sqlite3 "${wallsDB}" < "${confDir}"/dbSetup.sql
 else
-    echo "$me: Error - walls.db exists at $wallsDB. Script will not install in place of existing files"
+    echo "${me}: Error - walls.db exists at ${wallsDB}. Script will not install in place of existing files"
 fi
 
-if [[ ! -f "$userConf" ]]; then
-    cat > "$userConf" << EOS
+if [[ ! -f "${userConf}" ]]; then
+    cat > "${userConf}" << EOS
 #!/usr/bin/env bash
 # user.conf
 # Update your wallpaper folder and random selection qualifiers here
 
-wallDir=\$HOME/Pictures/Wallpapers
+wallDir=\${HOME}/Pictures/Wallpapers
 whereClause='selected=1'
 last_updated=
 EOS
 else
-    echo "$me: Error - user configuration exists at $userConf. Script will not install in place of existing files"
+    echo "${me}: Error - user configuration exists at ${userConf}. Script will not install in place of existing files"
 fi

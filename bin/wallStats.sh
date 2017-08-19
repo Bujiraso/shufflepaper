@@ -17,19 +17,19 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-me=$(basename "$0")
-myDir="$(dirname "$(readlink -f "$0")")"
-. "$myDir/../conf/shufflepaper.conf"
+me=$(basename "${0}")
+myDir="$(dirname "$(readlink -f "${0}")")"
+. "${myDir}/../conf/shufflepaper.conf"
 
-wallURI=$("$myDir/getWallURI.sh")
+wallURI=$("${myDir}/getWallURI.sh")
 while getopts ":df:hn" opt; do
-    case "$opt" in
+    case "${opt}" in
         "d") delimiter=true
            ;;
         "f") wallURI="$(readlink -f "${OPTARG}")"
            ;;
         "h") cat <<EOS
-Usage: $me [OPTIONS]
+Usage: ${me} [OPTIONS]
 
 Options:
     -d         Print with pipe (|) delimiter
@@ -45,40 +45,40 @@ EOS
 done
 
 findWall() {
-    if [[ "$(sqlite3 "$wallDB" 'SELECT count(*) FROM Wallpapers WHERE file_path="'"$wallURI"'"')" -eq 0 ]]; then
-        if [[ ! -f "$wallURI" ]]; then
+    if [[ "$(sqlite3 "${wallDB}" 'SELECT count(*) FROM Wallpapers WHERE file_path="'"${wallURI}"'"')" -eq 0 ]]; then
+        if [[ ! -f "${wallURI}" ]]; then
             # Wall does not exist.
             exit 1
         fi
         # File path must need updating
-        list=$(ls -li "$wallURI")
-        if [[ "$?" -eq 0 ]]; then
-            inode=$(echo "$list" | cut -f 1 -d ' ')
-	    sqlite3 "$wallDB" "UPDATE Wallpapers SET file_path=\"$wallURI\" WHERE inode=$inode"
+        list=$(ls -li "${wallURI}")
+        if [[ "${?}" -eq 0 ]]; then
+            inode=$(echo "${list}" | cut -f 1 -d ' ')
+	    sqlite3 "${wallDB}" "UPDATE Wallpapers SET file_path=\"${wallURI}\" WHERE inode=${inode}"
         fi
-        result="$(sqlite3 "$wallDB" "SELECT * FROM Wallpapers WHERE inode=$inode")"
-        if [[ -z "$result" ]]; then
-            echo "$me: Error finding wallpaper"
+        result="$(sqlite3 "${wallDB}" "SELECT * FROM Wallpapers WHERE inode=${inode}")"
+        if [[ -z "${result}" ]]; then
+            echo "${me}: Error finding wallpaper"
             exit 1
         fi
     else
-        result="$(sqlite3 "$wallDB" "SELECT * FROM Wallpapers WHERE file_path=\"$wallURI\"")"
+        result="$(sqlite3 "${wallDB}" "SELECT * FROM Wallpapers WHERE file_path=\"${wallURI}\"")"
     fi
 
-    if [[ -z "$noheader" ]]; then
+    if [[ -z "${noheader}" ]]; then
         echo "Inode|File Path|Width|Height|Selected|View Count|Star Rating|User Comments|View Option"
     fi
-    echo $result
+    echo ${result}
 }
 
 output="$(findWall)"
-ret=$?
-if [[ "$ret" -eq 0 ]]; then
-    if [[ -z "$delimiter" ]]; then
-        echo "$output" | column -s\| -t
+ret=${?}
+if [[ "${ret}" -eq 0 ]]; then
+    if [[ -z "${delimiter}" ]]; then
+        echo "${output}" | column -s\| -t
     else
-        echo "$output"
+        echo "${output}"
     fi
 else
-    exit "$ret"
+    exit "${ret}"
 fi
