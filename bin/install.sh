@@ -18,7 +18,7 @@
 
 # Vars
 confDir="$(dirname "${0}")"/../conf
-. "${confDir}/shufflepaper.conf"
+source "${confDir}/shufflepaper.conf"
 me="$(basename "${0}")"
 
 # Ensure data directory exists

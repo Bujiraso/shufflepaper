@@ -26,7 +26,7 @@ fi
 
 # Setup vars
 string=""
-. "$(dirname "${0}")"/../conf/shufflepaper.conf
+source "$(dirname "${0}")"/../conf/shufflepaper.conf
 wallDims=~/bin/wallDims.sh
 
 isSelected() {

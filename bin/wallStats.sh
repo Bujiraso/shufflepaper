@@ -19,7 +19,7 @@
 
 me=$(basename "${0}")
 myDir="$(dirname "$(readlink -f "${0}")")"
-. "${myDir}/../conf/shufflepaper.conf"
+source "${myDir}/../conf/shufflepaper.conf"
 
 wallURI=$("${myDir}/getWallURI.sh")
 while getopts ":df:hn" opt; do

@@ -17,6 +17,9 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 me=$(basename "${0}")
+myDir="$(dirname "$(readlink -f "${0}")")"
+source "${myDir}/../conf/shufflepaper.conf"
+
 if [[ ${#} -eq 0 ]]; then
     echo >&2 "${me}: No args given."
     exit 1
@@ -24,6 +27,7 @@ fi
 
 file="${1}"
 
+# TODO: Change this to take an arg instead of use global scope
 #Check that the file is prefixed by "file://"
 function prefixURI {
     if [[ ! -f  "$(echo "${file##*:\/\/}" | sed s/^\'// | sed s/\'$//)" ]]; then
@@ -38,14 +42,15 @@ function prefixURI {
 } 
 
 # Determine desktop session and change wallpaper
-if [ $(pgrep cinnamon | wc -l) -ne 0 ]; then
+if pgrep cinnamon > /dev/null; then
     prefixURI
     export $(cat /proc/$(pgrep -u `whoami` ^cinnamon | head -n 1)/environ | grep -z DBUS_SESSION_BUS_ADDRESS | tr -d \\0)
+    # TODO: This won't always be DISPLAY=:0
     DISPLAY=:0 gsettings set org.cinnamon.desktop.background picture-uri "${file}"
-elif [ $(pgrep mate-session | wc -l) -ne 0 ]; then
+elif pgrep mate-session > /dev/null; then
     export $(cat /proc/$(pgrep -u `whoami` ^mate-session | head -n 1)/environ | grep -z DBUS_SESSION_BUS_ADDRESS | tr -d \\0)
     DISPLAY=:0 gsettings set org.mate.background picture-filename "${file}"
-elif [ $(pgrep gnome | wc -l) -ne 0 ]; then
+elif pgrep 'gnome-shell$' > /dev/null; then
     prefixURI
     export "$(cat /proc/$(pgrep -u `whoami` ^gnome-shell | head -n 1)/environ | grep -z DBUS_SESSION_BUS_ADDRESS | tr -d \\0)"
     DISPLAY=:0 gsettings set org.gnome.desktop.background picture-uri "${file}"
@@ -54,4 +59,4 @@ else
     exit 3
 fi
 
-echo "$(date +%Y-%m-%d-%T): ${me}: Wallpaper set to ${file}" >> /tmp/shufflepaper.log
+echo "$(date +%Y-%m-%d-%T): ${me}: Wallpaper set to ${file}" >> ${logFile}

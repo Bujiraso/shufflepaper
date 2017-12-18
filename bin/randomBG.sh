@@ -18,7 +18,7 @@
 
 me="$(basename "${0}")"
 myDir="$(dirname "$(readlink -f "${0}")")"
-. "${myDir}/../conf/shufflepaper.conf"
+source "${myDir}/../conf/shufflepaper.conf"
 changeBG="${myDir}/changeBG.sh"
 alterWallInDB="${myDir}/alterWallInDB.sh"
 

@@ -20,11 +20,10 @@
 # Vars
 me="$(basename "${0}")"
 myDir="$(dirname "${0}")"
-. "${myDir}/../conf/shufflepaper.conf"
+source "${myDir}/../conf/shufflepaper.conf"
 
 diffFile=/tmp/inodeList.diff
 inodeList="${dataDir}"/inode.list
-logFile=/tmp/shufflepaper.log
 tempList="/tmp/inode.list"
 txnFile=/tmp/"${me}".txn
 
