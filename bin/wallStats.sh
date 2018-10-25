@@ -62,11 +62,11 @@ findWall() {
             exit 1
         fi
     else
-        result="$(sqlite3 "${wallDB}" "SELECT * FROM Wallpapers WHERE file_path=\"${wallURI}\"")"
+        result="$(sqlite3 "${wallDB}" "SELECT inode, hash, file_path, width, height, selected, view_count, star_rating, user_comments, view_mode FROM Wallpapers WHERE file_path=\"${wallURI}\"")"
     fi
 
     if [[ -z "${noheader}" ]]; then
-        echo "Inode|File Path|Width|Height|Selected|View Count|Star Rating|User Comments|View Option"
+        echo "Inode|Hash|File Path|Width|Height|Selected|View Count|Star Rating|User Comments|View Option"
     fi
     echo ${result}
 }

@@ -42,11 +42,13 @@ buildInsert(){
     file="${1}"
 
     # Insert syntax
-    string="INSERT OR REPLACE INTO Wallpapers(inode, file_path, width, height, selected) VALUES("
+    string="INSERT OR REPLACE INTO Wallpapers(inode, file_path, hash, width, height, selected) VALUES("
     # Inode
     string="${string}""$(stat "${file}" --printf "%i, ")"
     # File path
     string="${string}""\"${file}\", "
+    # Hash
+    string="${string}""\"$(sha1sum "${file}" | cut -d' ' -f 1)\", "
     # Dimensions
     dims=$("${wallDims}" -n -f "${file}")
     if [[ ${?} -ne 0 ]]; then
