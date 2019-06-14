@@ -48,7 +48,7 @@ done
 arg=${1}
 case "${arg}" in
     "centered"|"scaled"|"spanned"|"zoom"|"stretched"|"wallpaper")
-        export $(cat /proc/$(pgrep -u `whoami` ^gnome-shell | head -n 1)/environ | grep -z DBUS_SESSION_BUS_ADDRESS | tr -d \\0)
+        export $(dbus-launch)
         DISPLAY=:0 gsettings set org.gnome.desktop.background picture-options "${arg}"
         if [[ -z "${noUpdate}" ]]; then
             "$(dirname $(readlink -f "${0}"))/alterWallInDB.sh" -m "${arg}"
