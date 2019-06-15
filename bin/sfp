@@ -27,7 +27,7 @@ function commands_help() {
 Usage: $(basename "${0}") COMMAND
 
 Available commands are:
-    $(ls -1 sfp-* | tr -d '\n\r' | sed 's/sfp-/, /g;s/^, //')
+    $(compgen -c | grep 'sfp-' | sort | tr -d '\n\r' | sed 's/sfp-/, /g;s/^, //')
 EOS
 }
 
