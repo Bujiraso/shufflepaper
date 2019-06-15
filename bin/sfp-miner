@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# wallMiner.sh
+# sfp-miner
 # Mines in the user's wallpaper directory for pictures and adds them to the
 # database
-#  Copyright (C) 2015 - 2017 Bujiraso
+#  Copyright (C) 2015 - 2019 Bujiraso
 
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -19,8 +19,7 @@
 
 # Vars
 me="$(basename "${0}")"
-myDir="$(dirname "${0}")"
-source "${myDir}/../conf/shufflepaper.conf"
+source "${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf"
 
 diffFile=/tmp/inodeList.diff
 inodeList="${dataDir}"/inode.list
@@ -29,7 +28,7 @@ txnFile=/tmp/"${me}".txn
 
 # Ensure data directory exists
 if [[ ! -d "${dataDir}" ]]; then
-    "${myDir}"/install.sh
+    sfp init-db
 fi
 
 # Create inode list from database
@@ -49,7 +48,7 @@ while read line; do
     fi
     file=$(sqlite3 "${HOME}/.local/share/shufflepaper/walls.db" 'SELECT file_path FROM Wallpapers WHERE inode ='"${line}")
     # Updating dims also checks file path
-    "${myDir}/alterWallInDB.sh" -d -f "${file}"
+    sfp alter -d -f "${file}"
 done <<<"$(find "${wallDir}" \( -name "*jpg" -o -name "*png" \) -mtime "${timeSince}" -printf "%i\n" | sort)"
 # When finished update lastUpdated time
 sed -i 's/^\(last_updated=\).*$/\1'"$(date +%s)"'/' "${userConf}"
@@ -95,7 +94,7 @@ if [[ -f "${inodeList}" ]]; then
         numRemoved=$(grep \> "${diffFile}" | wc -l)
         count=0
         while read line; do
-             "${myDir}"/getSQLStatement.sh "${line}" >> "${txnFile}"
+             sfp get-sql-stmt "${line}" >> "${txnFile}"
              count=$((${count} + 1))
              echo -ne "Compiling transaction (${count} of ${numRemoved})\r"
         done <<< "$(grep \> ${diffFile} | sed 's/^> //')"
@@ -108,7 +107,7 @@ if [[ -f "${inodeList}" ]]; then
     # Update backgrounds with modification newer than the wallDB
     while read line; do
         change=true
-        "${myDir}"/getSQLStatement.sh "${line}" >> "${txnFile}"
+        sfp get-sql-stmt "${line}" >> "${txnFile}"
     done <<< "$(find "${wallDir}" -newer "${wallDB}" -type f \( -name "*png" -o -name "*jpg" \) -printf "%i\n" | sort)"
 
     if ! "${change}"; then
@@ -117,7 +116,7 @@ if [[ -f "${inodeList}" ]]; then
 
 else # If no inode list exists, add all wallpapers
     while read line; do
-        "${myDir}"/getSQLStatement.sh "${line}" >> "${txnFile}"
+        sfp get-sql-stmt "${line}" >> "${txnFile}"
     done <<< "$(cat ${tempList})"
 fi
 

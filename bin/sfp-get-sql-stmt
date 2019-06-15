@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# getSQLStatement.sh
+# sfp-get-sql-stmt
 # Returns the SQL statment for the given wallpaper inode or file path
-#  Copyright (C) 2015 - 2017 Bujiraso
+#  Copyright (C) 2015 - 2019 Bujiraso
 
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -26,8 +26,7 @@ fi
 
 # Setup vars
 string=""
-source "$(dirname "${0}")"/../conf/shufflepaper.conf
-wallDims=~/bin/wallDims.sh
+source "${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf"
 
 isSelected() {
     if [[ "${file}" == "*/Unselected/*" ]]; then
@@ -50,7 +49,7 @@ buildInsert(){
     # Hash
     string="${string}""\"$(sha1sum "${file}" | cut -d' ' -f 1)\", "
     # Dimensions
-    dims=$("${wallDims}" -n -f "${file}")
+    dims=$(sfp wall-dims -n -f "${file}")
     if [[ ${?} -ne 0 ]]; then
         echo "${me}: Failed to build insert for ${1}" > /dev/stderr
         exit 2
@@ -72,7 +71,7 @@ buildUpdate() {
         # File path
         string="${string}""file_path = \"${file}\", "
         # Dimensions
-        string="${string}""width = $("${wallDims}" -n -f "${file}" | tr -d '\n' | sed 's/ /, height = /'), "
+        string="${string}""width = $(sfp wall-dims -n -f "${file}" | tr -d '\n' | sed 's/ /, height = /'), "
         # Selectedness
         string="${string}""selected = $(isSelected "${file}") "
         # WHERE syntax

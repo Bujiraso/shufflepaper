@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# wallOption.sh
+# sfp-option
 # Changes the Picture Option of the wallpaper displayed in Gnome
-#  Copyright (C) 2015 - 2017 Bujiraso
+#  Copyright (C) 2015 - 2019 Bujiraso
 
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ case "${arg}" in
         export $(dbus-launch)
         DISPLAY=:0 gsettings set org.gnome.desktop.background picture-options "${arg}"
         if [[ -z "${noUpdate}" ]]; then
-            "$(dirname $(readlink -f "${0}"))/alterWallInDB.sh" -m "${arg}"
+            "$(dirname $(readlink -f "${0}"))/sfp-alter" -m "${arg}"
         fi
     ;;
     *) #Invalid view option

@@ -1,4 +1,20 @@
 #!/usr/bin/env bash
+# sfp
+# The front-end for shufflepaper
+#  Copyright (C) 2019 Bujiraso
+
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  any later version.
+
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 function dbug(){
     if [[ ! -z ${SFP_DEBUG+x} ]]; then
@@ -11,29 +27,41 @@ function commands_help(){
 Usage: $(basename "${0}") COMMAND
 
 Available commands are:
-    change-wall
+    $(ls -1 sfp-* | tr -d '\n\r' | sed 's/sfp-/, /g;s/^, //')
 EOS
 }
 
-# Verify subcommand is present or print commands_help
-if [[ ${#} -eq 0 ]]; then
-   commands_help
-   return 2
+# Assert that sfp can be called by subcommands
+if ! which sfp 2> /dev/null > /dev/null; then
+    sourceDir="$(dirname "$(readlink -f "${0}")")"
+    if [[ ! -d "${sourceDir}" ]]; then
+        echo "Cannot find sfp's source dir to execute subcommands through. Try installing sfp to your path" > /dev/stderr
+        exit 1
+    fi
+    export PATH="${PATH}:${sourceDir}"
 fi
 
+# Verify subcommand is present or print commands_help
+if [[ ${#} -eq 0 ]]; then
+    commands_help
+    exit 2
+fi
+
+# Set up sfp script source 
+dbug "User asked for ${command}"
+command="sfp-$(echo ${1} | sed 's/ /-/g')"
 # Shift to remove subcommand from its own args
-command="${1}"
 shift
 
-case "${command}" in
-    "change-wall")
-        source changeBG.sh
-        sfp-change-wall "${*}"
-        ;;
-    *)
-        echo "Invalid command ${command}"
-        return 3
-        ;;
-esac
+if ! which "${command}" >/dev/null 2>/dev/null; then
+    echo "Invalid command ${command}" > /dev/stderr
+    exit 3
+fi
+
+# Source script and run its main function
+dbug "Running ${command}"
+
+source "${command}"
+${command} "${*}"
 
 dbug "Exiting sfp"

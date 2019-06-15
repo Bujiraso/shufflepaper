@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# changeBG.sh
+# sfp-change
 # Changes the wallpaper for the current desktop session. Implemented for Cinnamon, Gnome and Mate
-#  Copyright (C) 2015 - 2017 Bujiraso
+#  Copyright (C) 2015 - 2019 Bujiraso
 
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-me="change-wall"
+me="change"
 
 #Check that the file is prefixed by "file://"
 function __sfp_prefixURI() {
@@ -33,8 +33,7 @@ function __sfp_prefixURI() {
 } 
 export -f __sfp_prefixURI
 
-function __sfp-change-wall() {
-    myDir="$(dirname "$(readlink -f "${0}")")"
+function __sfp-change() {
     source "${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf"
 
     if [[ ${#} -eq 0 ]]; then
@@ -66,6 +65,6 @@ function __sfp-change-wall() {
     echo "$(date +%Y-%m-%d-%T): ${me}: Wallpaper set to ${fpath}" >> ${logFile}
 }
 
-sfp-change-wall () {
-    __sfp-change-wall "${*}"
+sfp-change () {
+    __sfp-change "${*}"
 }

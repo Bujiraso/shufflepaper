@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# updateWallInDB.sh
+# sfp-alter
 # Updates various modifiable aspects of a wallpaper in the shufflepaper database
-#  Copyright (C) 2015 - 2017 Bujiraso
+#  Copyright (C) 2015 - 2019 Bujiraso
 
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,10 +16,9 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-me=$(basename "${0}")
-myDir="$(dirname "$(readlink -f "${0}")")"
-source "${myDir}/../conf/shufflepaper.conf"
-wallURI=$("${myDir}/getWallURI.sh")
+me="alter"
+source "${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf"
+wallURI=$(sfp get-uri)
 
 # The file needs to be asserted first, out of all the arguments
 count=1
@@ -39,7 +38,7 @@ while [[ "${count}" -le "${#}" ]]; do
 done
 
 #Get inode so that if /anything/ else changes we can still update
-inode=$("${myDir}/wallStats.sh" -n -f "${wallURI}" | cut -d ' ' -f 1)
+inode=$(sfp wall-stats -n -f "${wallURI}" | cut -d ' ' -f 1)
 
 if [[ "${#}" -ne 0 && -z "${inode}" ]]; then
     echo "${me}: Fatal error: no inode found for ${wallURI}" >&2
@@ -70,16 +69,16 @@ while getopts ":a:c:df:hm:p:s:t:u:v:" opt; do
            sqlChanges="${sqlChanges}"" user_comments = \"${comments}\","
            ;;
         "d")
-           dims=($("${myDir}/wallDims.sh" -n -f "${wallURI}"))
-           if [[ ${dims[0]} -eq 0 || ${dims[1]} -eq 0 ]]; then
-               echo "${me}: Cannot get dimensions for ${wallURI}." >&2
-               exit 6
-           fi
-           sqlChanges="${sqlChanges}"" width = ${dims[0]}, height = ${dims[1]},"
-           ;;
+            dims=($(sfp wall-dims -n -f "${wallURI}"))
+            if [[ ${dims[0]} -eq 0 || ${dims[1]} -eq 0 ]]; then
+                echo "${me}: Cannot get dimensions for ${wallURI}." >&2
+                exit 6
+            fi
+            sqlChanges="${sqlChanges}"" width = ${dims[0]}, height = ${dims[1]},"
+            ;;
         "h")
-           cat<<EOS
-Usage: ${me} OPTIONS...
+            cat <<EOS
+Usage: sfp ${me} OPTIONS...
 
 Options
   -a           Add user comment (appends comma, then argument)

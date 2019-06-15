@@ -17,7 +17,7 @@ To have ShufflePaper select a background for you on a regular interval, use a cr
 
 ```bash
 # Change background every ten minutes
-*/10 * * * * fully/qualified/install/location/randomBG.sh
+*/10 * * * * fully/qualified/install/location/sfp random
 ```
 
 ## Installation & Usage
@@ -25,4 +25,4 @@ To have ShufflePaper select a background for you on a regular interval, use a cr
 * Set wallpaper location in shufflepaper.conf and optionally set XDG_DATA_HOME
 * Run install.sh
 * Run wallMiner.sh to collect all the wallpapers (performance upgrades are planned for future releases)
-* Set up cron to run or manually call randomBG.sh when a new background is desired
+* Set up cron to run or manually call '$ sfp random' when a new background is desired
