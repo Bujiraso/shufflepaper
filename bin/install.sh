@@ -16,10 +16,17 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# Vars
-confDir="$(dirname "${0}")"/../conf
-source "${confDir}/shufflepaper.conf"
 me="$(basename "${0}")"
+confDir="$(dirname "${0}")"/../conf
+
+if [[ -z "${XDG_CONFIG_HOME}" || ! -d "${XDG_CONFIG_HOME}" ]]; then
+    echo "Cannot install without XDG_CONFIG_HOME set to a valid directory"
+    exit 4
+fi
+
+install -Dm 644 "${confDir}/shufflepaper.conf" "${XDG_CONFIG_HOME}/shufflepaper"
+# Source shufflepaper variables
+source ${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf
 
 # Ensure data directory exists
 if [[ ! -d "${dataDir}" ]]; then

@@ -16,45 +16,56 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-me=$(basename "${0}")
-myDir="$(dirname "$(readlink -f "${0}")")"
-source "${myDir}/../conf/shufflepaper.conf"
+me="change-wall"
 
-if [[ ${#} -eq 0 ]]; then
-    echo >&2 "${me}: No args given."
-    exit 1
-fi
-
-file="${1}"
-
-# TODO: Change this to take an arg instead of use global scope
 #Check that the file is prefixed by "file://"
-function prefixURI {
-    if [[ ! -f  "$(echo "${file##*:\/\/}" | sed s/^\'// | sed s/\'$//)" ]]; then
-        echo >&2 "${me}: File \"${file}\" does not exist"
+function __sfp_prefixURI() {
+    pfpath="${1}"
+    if [[ ! -f  "$(echo "${pfpath##*:\/\/}" | sed s/^\'// | sed s/\'$//)" ]]; then
+        echo >&2 "${me}: File \"${pfpath}\" does not exist"
         exit 2
     fi
 
-    if [[ ! "${file}" = *"file://"* ]]; then
-        tmp="file://""$(readlink -f "${file}")"
-        file="${tmp}"
+    if [[ ! "${pfpath}" = *"file://"* ]]; then
+        pfpath="file://""$(readlink -f "${pfpath}")"
     fi
+    echo "${pfpath}"
 } 
+export -f __sfp_prefixURI
 
-# Determine desktop session and change wallpaper
-export $(dbus-launch)
-if pgrep cinnamon > /dev/null; then
-    prefixURI
-    # TODO: This won't always be DISPLAY=:0
-    DISPLAY=:0 gsettings set org.cinnamon.desktop.background picture-uri "${file}"
-elif pgrep mate-session > /dev/null; then
-    DISPLAY=:0 gsettings set org.mate.background picture-filename "${file}"
-elif pgrep 'gnome-shell$' > /dev/null; then
-    prefixURI
-    DISPLAY=:0 gsettings set org.gnome.desktop.background picture-uri "${file}"
-else
-    echo >&2 "${me}: Cannot read for session ${DESKTOP_SESSION}"
-    exit 3
-fi
+function __sfp-change-wall() {
+    myDir="$(dirname "$(readlink -f "${0}")")"
+    source "${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf"
 
-echo "$(date +%Y-%m-%d-%T): ${me}: Wallpaper set to ${file}" >> ${logFile}
+    if [[ ${#} -eq 0 ]]; then
+        echo >&2 "${me}: No args given. Exiting without change."
+        exit 1
+    fi
+
+    fpath="${1}"
+
+
+    # Determine desktop session and change wallpaper
+    if pgrep cinnamon > /dev/null; then
+        pfpath=$(__sfp_prefixURI "${fpath}")
+        # TODO: This won't always be DISPLAY=:0
+        DISPLAY=:0 gsettings set org.cinnamon.desktop.background picture-uri "${pfpath}"
+    elif pgrep mate-session > /dev/null; then
+        DISPLAY=:0 gsettings set org.mate.background picture-filename "${fpath}"
+    elif pgrep 'gnome-shell$' > /dev/null; then
+        if [[ -z ${DBUS_SESSION_BUS_ADDRESS+x} ]]; then
+            export $(dbus-launch --exit-with-session gnome-session)
+        fi
+        pfpath=$(__sfp_prefixURI "${fpath}")
+        DISPLAY=:0 gsettings set org.gnome.desktop.background picture-uri "${pfpath}"
+    else
+        echo >&2 "${me}: Cannot read for session ${DESKTOP_SESSION}"
+        exit 3
+    fi
+
+    echo "$(date +%Y-%m-%d-%T): ${me}: Wallpaper set to ${fpath}" >> ${logFile}
+}
+
+sfp-change-wall () {
+    __sfp-change-wall "${*}"
+}

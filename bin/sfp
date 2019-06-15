@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+function dbug(){
+    if [[ ! -z ${SFP_DEBUG+x} ]]; then
+        echo "${*}"
+    fi
+}
+
+function commands_help(){
+    cat <<EOS
+Usage: $(basename "${0}") COMMAND
+
+Available commands are:
+    change-wall
+EOS
+}
+
+# Verify subcommand is present or print commands_help
+if [[ ${#} -eq 0 ]]; then
+   commands_help
+   return 2
+fi
+
+# Shift to remove subcommand from its own args
+command="${1}"
+shift
+
+case "${command}" in
+    "change-wall")
+        source changeBG.sh
+        sfp-change-wall "${*}"
+        ;;
+    *)
+        echo "Invalid command ${command}"
+        return 3
+        ;;
+esac
+
+dbug "Exiting sfp"
