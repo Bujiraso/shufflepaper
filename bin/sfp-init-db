@@ -16,32 +16,33 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-me="$(basename "${0}")"
-confDir="$(dirname "${0}")"/../conf
+subName="init-db"
+function __sfp-init-db() {
+    confDir="$(dirname "${0}")"/../conf
 
-if [[ -z "${XDG_CONFIG_HOME}" || ! -d "${XDG_CONFIG_HOME}" ]]; then
-    echo "Cannot install without XDG_CONFIG_HOME set to a valid directory"
-    exit 4
-fi
+    if [[ -z "${XDG_CONFIG_HOME}" || ! -d "${XDG_CONFIG_HOME}" ]]; then
+        echo "Cannot install without XDG_CONFIG_HOME set to a valid directory"
+        exit 4
+    fi
 
-install -Dm 644 "${confDir}/shufflepaper.conf" "${XDG_CONFIG_HOME}/shufflepaper"
-# Source shufflepaper variables
-source ${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf
+    install -Dm 644 "${confDir}/shufflepaper.conf" "${XDG_CONFIG_HOME}/shufflepaper"
+    # Source shufflepaper variables
+    source ${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf
 
-# Ensure data directory exists
-if [[ ! -d "${dataDir}" ]]; then
-    mkdir -p "${dataDir}"
-fi
+    # Ensure data directory exists
+    if [[ ! -d "${dataDir}" ]]; then
+        mkdir -p "${dataDir}"
+    fi
 
-# Set up database
-if [[ ! -f "${wallDB}" ]]; then
-    sqlite3 "${wallsDB}" < "${confDir}"/dbSetup.sql
-else
-    echo "${me}: Error - walls.db exists at ${wallsDB}. Script will not install in place of existing files"
-fi
+    # Set up database
+    if [[ ! -f "${wallDB}" ]]; then
+        sqlite3 "${wallsDB}" < "${confDir}"/dbSetup.sql
+    else
+        echo "${subName}: Error - walls.db exists at ${wallsDB}. Script will not install in place of existing files"
+    fi
 
-if [[ ! -f "${userConf}" ]]; then
-    cat > "${userConf}" << EOS
+    if [[ ! -f "${userConf}" ]]; then
+        cat > "${userConf}" << EOS
 #!/usr/bin/env bash
 # user.conf
 # Update your wallpaper folder and random selection qualifiers here
@@ -50,6 +51,11 @@ wallDir=\${HOME}/Pictures/Wallpapers
 whereClause='selected=1'
 last_updated=
 EOS
-else
-    echo "${me}: Error - user configuration exists at ${userConf}. Script will not install in place of existing files"
-fi
+    else
+        echo "${subName}: Error - user configuration exists at ${userConf}. Script will not install in place of existing files"
+    fi
+}
+
+function sfp-init-db() {
+    __sfp-init-db ${*}
+}

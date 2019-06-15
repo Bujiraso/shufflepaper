@@ -16,13 +16,13 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-function dbug(){
+function dbug() {
     if [[ ! -z ${SFP_DEBUG+x} ]]; then
-        echo "${*}"
+        echo ${*}
     fi
 }
 
-function commands_help(){
+function commands_help() {
     cat <<EOS
 Usage: $(basename "${0}") COMMAND
 
@@ -62,6 +62,6 @@ fi
 dbug "Running ${command}"
 
 source "${command}"
-${command} "${*}"
+${command} ${*}
 
-dbug "Exiting sfp"
+dbug "Exiting sfp ${command}"

@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
+# make file to deploy shufflepaper to a chosen directory
 
 if [[ ${#} -eq 0 ]]; then
-    echo "Need install dir"
+    echo "Usage: make.sh INSTALL_DIR"
     exit 1
 fi
 
@@ -13,15 +14,5 @@ if ! ls "${myDir}/bin/sfp" > /dev/null 2> /dev/null; then
     exit 1
 fi
 
-install -Dm 755 "${myDir}/bin/alterWallInDB.sh" "${installDir}"
-install -Dm 755 "${myDir}/bin/changeBG.sh" "${installDir}"
-install -Dm 755 "${myDir}/bin/getSQLStatement.sh" "${installDir}"
-install -Dm 755 "${myDir}/bin/getWallURI.sh" "${installDir}"
-install -Dm 755 "${myDir}/bin/install.sh" "${installDir}"
-install -Dm 755 "${myDir}/bin/randomBG.sh" "${installDir}"
-install -Dm 755 "${myDir}/bin/removeWall.sh" "${installDir}"
-install -Dm 755 "${myDir}/bin/sfp" "${installDir}"
-install -Dm 755 "${myDir}/bin/wallDims.sh" "${installDir}"
-install -Dm 755 "${myDir}/bin/wallMiner.sh" "${installDir}"
-install -Dm 755 "${myDir}/bin/wallOption.sh" "${installDir}"
-install -Dm 755 "${myDir}/bin/wallStats.sh" "${installDir}"
+# Install all sfp scripts to the install dir as executables
+install -Dm 755 -t "${installDir}" "${myDir}"/bin/sfp*

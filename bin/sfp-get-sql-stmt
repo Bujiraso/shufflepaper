@@ -16,28 +16,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-me=$(basename "${0}")
-
-# Check args
-if [[ "${#}" -eq 0 ]]; then
-    echo >&2 "${me}: Missing args"
-    exit 1
-fi
-
-# Setup vars
-string=""
-source "${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf"
-
-isSelected() {
-    if [[ "${file}" == "*/Unselected/*" ]]; then
-        echo 0
-    else
-        echo 1
-    fi
-}
+subName="get-sql-stmt"
 
 # Function: Compile an SQL Insert statement
-buildInsert(){
+function __sfp-get-sql-stmt-buildInsert() {
     file="${1}"
 
     # Insert syntax
@@ -49,9 +31,9 @@ buildInsert(){
     # Hash
     string="${string}""\"$(sha1sum "${file}" | cut -d' ' -f 1)\", "
     # Dimensions
-    dims=$(sfp wall-dims -n -f "${file}")
+    dims=$(sfp dims -n -f "${file}")
     if [[ ${?} -ne 0 ]]; then
-        echo "${me}: Failed to build insert for ${1}" > /dev/stderr
+        echo "${subName}: Failed to build insert for ${1}" > /dev/stderr
         exit 2
     fi
     string="${string}""$(echo ${dims} | tr -d '\n' | sed 's/ /, /'), "
@@ -60,9 +42,10 @@ buildInsert(){
 
     echo ${string}
 }
+export -f __sfp-get-sql-stmt-buildInsert
 
 # Function: Compile an SQL Update statement
-buildUpdate() {
+function __sfp-get-sql-stmt-buildUpdate() {
     inode="${1}"
     file="$(find "${wallDir}" -inum "${inode}")"
     if [[ -f "${file}" ]]; then # and the argument is a file
@@ -71,7 +54,7 @@ buildUpdate() {
         # File path
         string="${string}""file_path = \"${file}\", "
         # Dimensions
-        string="${string}""width = $(sfp wall-dims -n -f "${file}" | tr -d '\n' | sed 's/ /, height = /'), "
+        string="${string}""width = $(sfp dims -n -f "${file}" | tr -d '\n' | sed 's/ /, height = /'), "
         # Selectedness
         string="${string}""selected = $(isSelected "${file}") "
         # WHERE syntax
@@ -81,24 +64,49 @@ buildUpdate() {
     fi
     echo ${string}
 }
+export -f __sfp-get-sql-stmt-buildUpdate
 
-if [[ "${1}" =~ ^[0-9]+$ ]]; then # Argument is an inode
-    inode="${1}"
-    # Find file
-    file=$(readlink -f "$(find ${wallDir} -inum ${inode})")
-
-    if [[ -f "${file}" ]]; then # No entry, but file exists
-        string="$(buildInsert "${file}")"
-    else
-        echo "${me}: File not found for inode ${1}" > /dev/stderr
+function __sfp-get-sql-stmt() {
+    # Check args
+    if [[ "${#}" -eq 0 ]]; then
+        echo >&2 "${subName}: Missing args"
+        exit 1
     fi
-else # Argument is not numerical
-    file="${1}"
-    if [[ -f "${file}" ]]; then
-        string="$(buildInsert "${file}")"
-    fi
-fi
 
-if [[ ! -z "${string}" ]]; then
-    echo ${string}
-fi
+    # Setup vars
+    string=""
+    source "${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf"
+
+    function isSelected() (
+        if [[ "${file}" == "*/Unselected/*" ]]; then
+            echo 0
+        else
+            echo 1
+        fi
+    )
+
+    if [[ "${1}" =~ ^[0-9]+$ ]]; then # Argument is an inode
+        inode="${1}"
+        # Find file
+        file=$(readlink -f "$(find ${wallDir} -inum ${inode})")
+
+        if [[ -f "${file}" ]]; then # No entry, but file exists
+            string="$(__sfp-get-sql-stmt-buildInsert "${file}")"
+        else
+            echo "${subName}: File not found for inode ${1}" > /dev/stderr
+        fi
+    else # Argument is not numerical
+        file="${1}"
+        if [[ -f "${file}" ]]; then
+            string="$(__sfp-get-sql-stmt-buildInsert "${file}")"
+        fi
+    fi
+
+    if [[ ! -z "${string}" ]]; then
+        echo ${string}
+    fi
+}
+
+function sfp-get-sql-stmt() {
+    __sfp-get-sql-stmt ${*}
+}

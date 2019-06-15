@@ -17,33 +17,15 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-me=$(basename "${0}")
-source "${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf"
+subName="stats"
 
-wallURI=$(sfp get-uri)
-while getopts ":df:hn" opt; do
-    case "${opt}" in
-        "d") delimiter=true
-           ;;
-        "f") wallURI="$(readlink -f "${OPTARG}")"
-           ;;
-        "h") cat <<EOS
-Usage: ${me} [OPTIONS]
+function __sfp-stats-readDB() {
+    if [[ ${#} -eq 0 || "${1}" == "" ]]; then
+        wallURI="$(sfp get-uri)"
+    else
+        wallURI="${1}"
+    fi
 
-Options:
-    -d         Print with pipe (|) delimiter
-    -f         Use the given file instead of the current wallpaper
-    -h         Print this help
-    -n         Do not print the header column line
-EOS
-              exit 0
-           ;;
-        "n") noheader=true
-           ;;
-    esac
-done
-
-findWall() {
     if [[ "$(sqlite3 "${wallDB}" 'SELECT count(*) FROM Wallpapers WHERE file_path="'"${wallURI}"'"')" -eq 0 ]]; then
         if [[ ! -f "${wallURI}" ]]; then
             # Wall does not exist.
@@ -57,7 +39,7 @@ findWall() {
         fi
         result="$(sqlite3 "${wallDB}" "SELECT * FROM Wallpapers WHERE inode=${inode}")"
         if [[ -z "${result}" ]]; then
-            echo "${me}: Error finding wallpaper"
+            echo "${subName}: Error finding wallpaper"
             exit 1
         fi
     else
@@ -69,15 +51,51 @@ findWall() {
     fi
     echo ${result}
 }
+export -f __sfp-stats-readDB
 
-output="$(findWall)"
-ret=${?}
-if [[ "${ret}" -eq 0 ]]; then
-    if [[ -z "${delimiter}" ]]; then
-        echo "${output}" | column -s\| -t
+
+function __sfp-stats-help() {
+    cat <<EOS
+Usage: ${subName} [OPTIONS]
+
+Options:
+    -d         Print with pipe (|) delimiter
+    -f         Use the given file instead of the current wallpaper
+    -h         Print this help
+    -n         Do not print the header column line
+EOS
+}
+
+function __sfp-stats() {
+    source "${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf"
+
+    while getopts ":df:hn" opt; do
+        case "${opt}" in
+            "d") delimiter=true
+                ;;
+            "f") wallArg="$(readlink -f "${OPTARG}")"
+                ;;
+            "h") 
+                __sfp-stats-help
+                exit 0
+                ;;
+            "n") noheader=true
+                ;;
+        esac
+    done
+    output="$(__sfp-stats-readDB "${wallArg}")"
+    ret=${?}
+    if [[ "${ret}" -eq 0 ]]; then
+        if [[ -z "${delimiter}" ]]; then
+            echo "${output}" | column -s\| -t
+        else
+            echo "${output}"
+        fi
     else
-        echo "${output}"
+        exit "${ret}"
     fi
-else
-    exit "${ret}"
-fi
+}
+
+function sfp-stats() {
+    __sfp-stats ${*}
+}

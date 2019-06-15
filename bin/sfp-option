@@ -16,12 +16,12 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-me="$(basename "${0}")"
+subName="option"
 OPTIONS="centered scaled spanned zoom stretched wallpaper"
 
-help() {
+function __sfp-option-help() {
     cat << EOS
-Usage: ${me} [OPTIONS...] <ARGUMENT>
+Usage: ${subName} [OPTIONS...] <ARGUMENT>
     -h        Print this help message and exit
     -n        No update of wallpaper in DB
 Argument can be one of: ${OPTIONS}
@@ -29,33 +29,39 @@ EOS
     exit 0
 }
 
-if [[ ${#} -eq 0 ]]; then
-    help
-fi
+function __sfp-option() {
+    if [[ ${#} -eq 0 ]]; then
+        __sfp-option-help
+    fi
 
-while getopts "hn" opt; do
-    case "${opt}" in
-        "h")
-            help
+    while getopts "hn" opt; do
+        case "${opt}" in
+            "h")
+                __sfp-option-help
+                ;;
+            "n")
+                noUpdate=1
+                ;;
+        esac
+        shift
+    done
+
+    arg=${1}
+    case "${arg}" in
+        "centered"|"scaled"|"spanned"|"zoom"|"stretched"|"wallpaper")
+            export $(dbus-launch)
+            DISPLAY=:0 gsettings set org.gnome.desktop.background picture-options "${arg}"
+            if [[ -z "${noUpdate}" ]]; then
+                sfp alter -m "${arg}"
+            fi
             ;;
-        "n")
-            noUpdate=1
+        *) #Invalid view option
+            echo "${subName}: Invalid argument - ${arg}" >&2
+            exit 1
             ;;
     esac
-    shift
-done
+}
 
-arg=${1}
-case "${arg}" in
-    "centered"|"scaled"|"spanned"|"zoom"|"stretched"|"wallpaper")
-        export $(dbus-launch)
-        DISPLAY=:0 gsettings set org.gnome.desktop.background picture-options "${arg}"
-        if [[ -z "${noUpdate}" ]]; then
-            "$(dirname $(readlink -f "${0}"))/sfp-alter" -m "${arg}"
-        fi
-    ;;
-    *) #Invalid view option
-        echo "${me}: Invalid argument - ${arg}" >&2
-        exit 1
-    ;;
-esac
+function sfp-option {
+    __sfp-option ${*}
+}
