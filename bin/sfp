@@ -17,9 +17,7 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 function dbug() {
-    if [[ ! -z ${SFP_DEBUG+x} ]]; then
-        echo ${*}
-    fi
+    [[ ! -z ${SFP_DEBUG+x} ]] && echo ${*}
 }
 
 function commands_help() {
@@ -43,12 +41,13 @@ fi
 
 # Verify subcommand is present or print commands_help
 if [[ ${#} -eq 0 ]]; then
+    dbug "No args received. Printing help"
     commands_help
     exit 0
 fi
 
 # Set up sfp script source 
-dbug "User asked for ${command}"
+dbug "User wants ${command}"
 command="sfp-$(echo ${1} | sed 's/ /-/g')"
 # Shift to remove subcommand from its own args
 shift
@@ -58,10 +57,15 @@ if ! which "${command}" >/dev/null 2>/dev/null; then
     exit 3
 fi
 
-# Source script and run its main function
-dbug "Running ${command}"
+# Source configuration file if it exists
+dbug "Sourcing config"
+[[ -f "${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf" ]] && source "${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf"
 
+# Source script and run its main function
+dbug "Sourcing ${command}"
 source "${command}"
+
+dbug "Running '${command}' '${*}'"
 ${command} ${*}
 
-dbug "Exiting sfp ${command}"
+dbug "Done ${command}"

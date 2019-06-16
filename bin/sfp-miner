@@ -20,20 +20,19 @@
 subName="miner"
 
 function __sfp-miner() {
-    source "${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf"
 
     diffFile=/tmp/inodeList.diff
-    inodeList="${dataDir}"/inode.list
+    inodeList="${SFP_DATA_HOME}"/inode.list
     tempList="/tmp/inode.list"
     txnFile=/tmp/"${subName}".txn
 
     # Ensure data directory exists
-    if [[ ! -d "${dataDir}" ]]; then
+    if [[ ! -d "${SFP_DATA_HOME}" ]]; then
         sfp init-db
     fi
 
     # Create inode list from database
-    sqlite3 "${wallDB}" "SELECT inode FROM Wallpapers;" | sort > "${inodeList}"
+    sqlite3 "${SFP_DATABASE_FILE}" "SELECT inode FROM Wallpapers;" | sort > "${inodeList}"
 
     # Update all wallpapers that have been modified since last run
     time=$(date +%s)
@@ -81,7 +80,7 @@ function __sfp-miner() {
         fi
 
         if [[ -s "${txnFile}" ]]; then
-            sqlite3 "${wallDB}" < "${txnFile}"
+            sqlite3 "${SFP_DATABASE_FILE}" < "${txnFile}"
             echo > "${txnFile}"
             # If deletion fails, don't press on -- user needs to work it out
             if [[ ${?} -ne 0 ]]; then
@@ -105,11 +104,11 @@ function __sfp-miner() {
 
         rm "${diffFile}"
 
-        # Update backgrounds with modification newer than the wallDB
+        # Update backgrounds with modification newer than the SFP_DATABASE_FILE
         while read line; do
             change=true
             sfp get-sql-stmt "${line}" >> "${txnFile}"
-        done <<< "$(find "${wallDir}" -newer "${wallDB}" -type f \( -name "*png" -o -name "*jpg" \) -printf "%i\n" | sort)"
+        done <<< "$(find "${wallDir}" -newer "${SFP_DATABASE_FILE}" -type f \( -name "*png" -o -name "*jpg" \) -printf "%i\n" | sort)"
 
         if ! "${change}"; then
             echo "${subName}: $(date +%D.%T) No changes to wallpapers detected." >> ${logFile}
@@ -123,7 +122,7 @@ function __sfp-miner() {
 
     if [[ -s "${txnFile}" ]]; then
         echo "Running update transaction"
-        sqlite3 "${wallDB}" < "${txnFile}"
+        sqlite3 "${SFP_DATABASE_FILE}" < "${txnFile}"
 
         # On fail: warn and exit
         if [[ ${?} -ne 0 ]]; then

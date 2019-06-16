@@ -24,7 +24,6 @@ function __sfp-remove() {
     fi
 
     # Setup vars
-    source "${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf"
     file="$(readlink -f "${1}")"
     me=$(basename "${0}")
 
@@ -39,7 +38,7 @@ function __sfp-remove() {
     fi
 
     # Run SQL command
-    sqlite3 "${wallDB}" "${string}"
+    sqlite3 "${SFP_DATABASE_FILE}" "${string}"
 
     # Report any errors
     if [[ ${?} -ne 0 ]]; then

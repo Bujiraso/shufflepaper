@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # sfp-init-db
-# Creates the wallDB
+# Creates the SFP_DATABASE_FILE
 #  Copyright (C) 2015 - 2019 Bujiraso
 
 #  This program is free software: you can redistribute it and/or modify
@@ -27,15 +27,14 @@ function __sfp-init-db() {
 
     install -Dm 644 "${confDir}/shufflepaper.conf" "${XDG_CONFIG_HOME}/shufflepaper"
     # Source shufflepaper variables
-    source ${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf
 
     # Ensure data directory exists
-    if [[ ! -d "${dataDir}" ]]; then
-        mkdir -p "${dataDir}"
+    if [[ ! -d "${SFP_DATA_HOME}" ]]; then
+        mkdir -p "${SFP_DATA_HOME}"
     fi
 
     # Set up database
-    if [[ ! -f "${wallDB}" ]]; then
+    if [[ ! -f "${SFP_DATABASE_FILE}" ]]; then
         sqlite3 "${wallsDB}" < "${confDir}"/dbSetup.sql
     else
         echo "${subName}: Error - walls.db exists at ${wallsDB}. Script will not install in place of existing files"

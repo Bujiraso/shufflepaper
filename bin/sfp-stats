@@ -26,7 +26,7 @@ function __sfp-stats-readDB() {
         wallURI="${1}"
     fi
 
-    if [[ "$(sqlite3 "${wallDB}" 'SELECT count(*) FROM Wallpapers WHERE file_path="'"${wallURI}"'"')" -eq 0 ]]; then
+    if [[ "$(sqlite3 "${SFP_DATABASE_FILE}" 'SELECT count(*) FROM Wallpapers WHERE file_path="'"${wallURI}"'"')" -eq 0 ]]; then
         if [[ ! -f "${wallURI}" ]]; then
             # Wall does not exist.
             exit 1
@@ -35,15 +35,15 @@ function __sfp-stats-readDB() {
         list=$(ls -li "${wallURI}")
         if [[ "${?}" -eq 0 ]]; then
             inode=$(echo "${list}" | cut -f 1 -d ' ')
-	    sqlite3 "${wallDB}" "UPDATE Wallpapers SET file_path=\"${wallURI}\" WHERE inode=${inode}"
+	    sqlite3 "${SFP_DATABASE_FILE}" "UPDATE Wallpapers SET file_path=\"${wallURI}\" WHERE inode=${inode}"
         fi
-        result="$(sqlite3 "${wallDB}" "SELECT * FROM Wallpapers WHERE inode=${inode}")"
+        result="$(sqlite3 "${SFP_DATABASE_FILE}" "SELECT * FROM Wallpapers WHERE inode=${inode}")"
         if [[ -z "${result}" ]]; then
             echo "${subName}: Error finding wallpaper"
             exit 1
         fi
     else
-        result="$(sqlite3 "${wallDB}" "SELECT inode, hash, file_path, width, height, selected, view_count, star_rating, user_comments, view_mode FROM Wallpapers WHERE file_path=\"${wallURI}\"")"
+        result="$(sqlite3 "${SFP_DATABASE_FILE}" "SELECT inode, hash, file_path, width, height, selected, view_count, star_rating, user_comments, view_mode FROM Wallpapers WHERE file_path=\"${wallURI}\"")"
     fi
 
     if [[ -z "${noheader}" ]]; then
@@ -67,7 +67,6 @@ EOS
 }
 
 function __sfp-stats() {
-    source "${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf"
 
     while getopts ":df:hn" opt; do
         case "${opt}" in

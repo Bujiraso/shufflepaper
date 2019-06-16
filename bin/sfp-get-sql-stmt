@@ -75,7 +75,6 @@ function __sfp-get-sql-stmt() {
 
     # Setup vars
     string=""
-    source "${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf"
 
     function isSelected() (
         if [[ "${file}" == "*/Unselected/*" ]]; then
