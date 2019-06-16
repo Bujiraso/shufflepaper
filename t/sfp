@@ -9,7 +9,7 @@ bash -c "sfp" | grep 'subcommands' > /dev/null
 # Command must list built in subcommands, e.g. stats
 bash -c "sfp" | grep 'stats' > /dev/null
 
-# Sub commands must be callable
+# Sub commands (extensions) must be callable
 testSubc="/tmp/sfp-test/sfp-test"
 mkdir -p "$(dirname "${testSubc}")"
 cat >> ${testSubc} <<EOS
