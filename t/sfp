@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# Command must exist
+bash -c "sfp" > /dev/null
+
+# Command must list subcommands
+bash -c "sfp" | grep 'subcommands' > /dev/null
+
+# Command must list built in subcommands, e.g. stats
+bash -c "sfp" | grep 'stats' > /dev/null
+
+# Sub commands must be callable
+testSubc="/tmp/sfp-test/sfp-test"
+mkdir -p "$(dirname "${testSubc}")"
+cat >> ${testSubc} <<EOS
+#!/usr/bin/env bash
+function sfp-test() {
+    echo Tests are magic
+}
+EOS
+chmod +x "${testSubc}"
+bash -c "export 'PATH=${PATH}:$(dirname "${testSubc}")'; sfp test"  | grep magic > /dev/null
