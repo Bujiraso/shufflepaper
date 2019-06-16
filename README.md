@@ -11,7 +11,7 @@ by Bujiraso, licensed under GPLv3 or later (see COPYING)
 ## Description
 ShufflePaper builds a wallpaper database from a folder of images and is capable of randomly selecting your desktop wallpaper and managing metadata about your wallpapers.
 
-The default wallpaper location is `$HOME/Pictures/Wallpapers` and can be changed within the `shufflepaper.conf` in the conf directory
+The default wallpaper location is `$HOME/Pictures/Wallpapers` and can be changed within the configuration file in the conf directory (detailed further below)
 
 ## Installation & First Set up
 * Download the project (extract if necessary)
