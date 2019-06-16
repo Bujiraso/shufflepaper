@@ -38,7 +38,7 @@ function __sfp-remove() {
     fi
 
     # Run SQL command
-    sqlite3 "${SFP_DATABASE_FILE}" "${string}"
+    sfp query "${string}"
 
     # Report any errors
     if [[ ${?} -ne 0 ]]; then

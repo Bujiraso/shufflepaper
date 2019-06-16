@@ -20,7 +20,7 @@ subName="random"
 
 function __sfp-random() {
 
-    list=$(sqlite3 "${SFP_DATABASE_FILE}" 'SELECT inode,file_path,view_count,view_mode FROM Wallpapers WHERE '"${whereClause}")
+    list=$(sfp query "SELECT inode,file_path,view_count,view_mode FROM Wallpapers WHERE ${whereClause}")
     SAVEIFS=${IFS}
     IFS='|'
     result=($(echo "${list}" | shuf | head -n 1))

@@ -67,5 +67,7 @@ source "${command}"
 
 dbug "Running '${command}' '${*}'"
 ${command} ${*}
+retVal="${?}"
 
 dbug "Done ${command}"
+exit ${retVal}

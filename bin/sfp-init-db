@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # sfp-init-db
-# Creates the SFP_DATABASE_FILE
+# Creates the sfp database file
 #  Copyright (C) 2015 - 2019 Bujiraso
 
 #  This program is free software: you can redistribute it and/or modify
@@ -34,8 +34,8 @@ function __sfp-init-db() {
     fi
 
     # Set up database
-    if [[ ! -f "${SFP_DATABASE_FILE}" ]]; then
-        sqlite3 "${wallsDB}" < "${confDir}"/dbSetup.sql
+    if ! $(sfp query --check); then
+        sfp query -f "${confDir}"/dbSetup.sql
     else
         echo "${subName}: Error - walls.db exists at ${wallsDB}. Script will not install in place of existing files"
     fi

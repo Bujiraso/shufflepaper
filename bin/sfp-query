@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# sfp-query
+# Queries the database. Helps to abstract some knowledge from the scripts
+#  Copyright (C) 2019 Bujiraso
+
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  any later version.
+
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+subName="query"
+
+function __sfp-query-help(){
+    cat <<EOS
+Usage: ${subName} (QUERY|-f FILE)
+EOS
+}
+
+function __sfp-query() {
+    if [[ "${1}" == "-f" ]]; then
+        if [[ ${#} -ne 2 || ! -f ${2} ]]; then
+                echo "subName: Missing file to operate on with -f switch"
+        fi
+        sqlite3 "${sfpDatabaseFile}" < "${2}"
+    else
+        sqlite3 "${sfpDatabaseFile}" "${1}"
+    fi
+}
+
+function __sfp-query-set-db-vars() {
+    sfpDataHome="${XDG_DATA_HOME:="${HOME}/.local/share"}/shufflepaper"
+    export sfpDataHome
+    sfpDatabaseFile="${sfpDataHome}/walls.db"
+    export sfpDatabaseFile
+}
+
+function sfp-query(){
+    if [[ ${#} -eq 0 ]]; then
+        echo "${subName}: Missing argument." > /dev/stderr
+        __sfp-query-help
+        return 2
+    elif [[ ${#} -gt 2 ]]; then
+        echo "${subName}: Too many arguments." > /dev/stderr
+        __sfp-query-help
+        return 2
+    fi
+
+    __sfp-query-set-db-vars
+
+    if [[ ${#} -eq 1 && ${1} == "--check" ]]; then
+        test -f "${sfpDatabaseFile}"
+        return ${?}
+    elif [[ ${#} -eq 1 && ${1} == "--print-db" ]]; then
+        echo "${sfpDatabaseFile}"
+        return 0
+    fi
+
+    __sfp-query ${*}
+}

@@ -81,7 +81,7 @@ function __sfp-alter() {
     while getopts ":a:c:df:hm:p:s:t:u:v:" opt; do
         case "${opt}" in
             "a")
-                comments="$(sqlite3 "${SFP_DATABASE_FILE}" "SELECT user_comments FROM Wallpapers WHERE inode=${inode}")"
+                comments="$(sfp query "SELECT user_comments FROM Wallpapers WHERE inode=${inode}")"
                 if [[ -z "${sqlChanges}" ]]; then
                     comments=","
                 fi
@@ -143,7 +143,7 @@ function __sfp-alter() {
             "u")
                 if [[ "${OPTARG}" == "-" ]]; then
                     tempFile="/tmp/alterWallInDB.$(date +%s).comments"
-                    sqlite3 "${SFP_DATABASE_FILE}" "SELECT user_comments FROM Wallpapers WHERE inode=${inode}" > ${tempFile}
+                    sfp query "SELECT user_comments FROM Wallpapers WHERE inode=${inode}" > ${tempFile}
                     ${EDITOR} ${tempFile}
                     comments=$(cat "${tempFile}")
                     sqlChanges="${sqlChanges}""user_comments = \"${comments}\","
@@ -173,7 +173,7 @@ function __sfp-alter() {
     if [[ ! -z "${sqlChanges}" ]]; then
         sqlStmt="UPDATE Wallpapers SET ${sqlChanges%,} WHERE inode=${inode}"
         echo "$(date +%Y-%m-%d-%T): ${subName}: Running ${sqlStmt}" >> "${logFile}"
-        sqlite3 "${SFP_DATABASE_FILE}" "${sqlStmt}"
+        sfp query "${sqlStmt}"
         if [[ ${?} -ne 0 ]]; then
             echo "${subName}: Errors occurred updating ${wallURI} while running ${sqlStmt}" > >(tee -a "${logFile}" >&2)
         fi
