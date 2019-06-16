@@ -56,5 +56,5 @@ function __sfp-random() {
 }
 
 function sfp-random() {
-    __sfp-random ${*}
+    __sfp-random "${@}"
 }

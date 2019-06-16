@@ -41,5 +41,5 @@ function __sfp-get-uri() {
 }
 
 function sfp-get-uri() {
-    __sfp-get-uri ${*}
+    __sfp-get-uri "${@}"
 }

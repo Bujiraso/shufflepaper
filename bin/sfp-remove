@@ -48,5 +48,5 @@ function __sfp-remove() {
 }
 
 function sfp-remove() {
-    __sfp-remove ${*}
+    __sfp-remove "${@}"
 }

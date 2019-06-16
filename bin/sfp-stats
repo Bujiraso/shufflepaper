@@ -96,5 +96,5 @@ function __sfp-stats() {
 }
 
 function sfp-stats() {
-    __sfp-stats ${*}
+    __sfp-stats "${@}"
 }

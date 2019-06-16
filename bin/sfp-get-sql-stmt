@@ -107,5 +107,5 @@ function __sfp-get-sql-stmt() {
 }
 
 function sfp-get-sql-stmt() {
-    __sfp-get-sql-stmt ${*}
+    __sfp-get-sql-stmt "${@}"
 }

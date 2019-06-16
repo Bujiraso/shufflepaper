@@ -17,7 +17,7 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 function dbug() {
-    [[ ! -z ${SFP_DEBUG+x} ]] && echo ${*}
+    [[ ! -z ${SFP_DEBUG+x} ]] && echo "${@}"
 }
 
 function commands_help() {
@@ -65,8 +65,8 @@ dbug "Sourcing config"
 dbug "Sourcing ${command}"
 source "${command}"
 
-dbug "Running '${command}' '${*}'"
-${command} ${*}
+dbug "Running '${command}' '"${@}"'"
+${command} "${@}"
 retVal="${?}"
 
 dbug "Done ${command}"

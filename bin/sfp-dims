@@ -92,6 +92,6 @@ function __sfp-dims() {
 }
 
 function sfp-dims() {
-    __sfp-dims ${*}
+    __sfp-dims "${@}"
 }
 

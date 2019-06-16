@@ -140,5 +140,5 @@ function __sfp-miner() {
 }
 
 function sfp-miner() {
-    __sfp-miner ${*}
+    __sfp-miner "${@}"
 }

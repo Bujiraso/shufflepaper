@@ -63,5 +63,5 @@ function sfp-query(){
         return 0
     fi
 
-    __sfp-query ${*}
+    __sfp-query "${@}"
 }

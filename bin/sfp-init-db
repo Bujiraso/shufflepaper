@@ -56,5 +56,5 @@ EOS
 }
 
 function sfp-init-db() {
-    __sfp-init-db ${*}
+    __sfp-init-db "${@}"
 }

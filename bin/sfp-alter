@@ -183,5 +183,5 @@ function __sfp-alter() {
 }
 
 function sfp-alter() {
-    __sfp-alter ${*}
+    __sfp-alter "${@}"
 }
