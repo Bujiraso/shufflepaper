@@ -20,6 +20,8 @@ install() {
 }
 
 function test() {
+    # Put the bin dir here at the start of the path to ensure intercepting of user's config
+    export PATH="${myDir}/bin/":${PATH}
     for testFile in "${myDir}"/t/*; do
         "${testFile}"
         testResult=${?}
