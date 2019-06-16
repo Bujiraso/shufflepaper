@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# sfp-change
+# sfp-display
 # Changes the wallpaper for the current desktop session. Implemented for Cinnamon, Gnome and Mate
 #  Copyright (C) 2015 - 2019 Bujiraso
 
@@ -33,7 +33,7 @@ function __sfp_prefixURI() {
 } 
 export -f __sfp_prefixURI
 
-function __sfp-change() {
+function __sfp-display() {
 
     if [[ ${#} -eq 0 ]]; then
         echo >&2 "${subName}: No args given. Exiting without change."
@@ -64,6 +64,6 @@ function __sfp-change() {
     _sfp-dbug "$(date +%Y-%m-%d-%T): ${subName}: Wallpaper set to ${fpath}"
 }
 
-sfp-change () {
-    __sfp-change "${@}"
+sfp-display () {
+    __sfp-display "${@}"
 }
