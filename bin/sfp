@@ -16,10 +16,25 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-function _sfp-dbug() {
-    [[ ! -z ${SFP_DEBUG+x} ]] && echo "${@}"
+# Err -> to user on stderr and log file
+function _sfp-err() {
+    echo "${@}" | tee -a "${_SFP_LOG_FILE}" > /dev/stderr
 }
-export -f _sfp-dbug
+
+# Info -> to user and log file
+function _sfp-info() {
+    echo "${@}" | tee -a "${_SFP_LOG_FILE}"
+}
+
+# Debug -> to log file only
+function _sfp-dbug() {
+    echo "${@}" >> "${_SFP_LOG_FILE}"
+}
+
+# Trace -> conditionally sent to both screen and log file
+function _sfp-trace() {
+    [[ ! -z ${SFP_DEBUG+x} ]] && echo "${@}" | tee -a "${_SFP_LOG_FILE}"
+}
 
 function __sfp-fe-commands-help() {
     cat <<EOS
@@ -31,6 +46,13 @@ EOS
 }
 
 function sfp(){
+    # Export logging commands
+    _SFP_LOG_FILE="${XDG_DATA_HOME}/shufflepaper/shufflepaper.log"
+    export -f _sfp-err
+    export -f _sfp-info
+    export -f _sfp-dbug
+    export -f _sfp-trace
+
     # Assert that sfp can be called by subcommands
     if ! which sfp 2> /dev/null > /dev/null; then
         sourceDir="$(dirname "$(readlink -f "${0}")")"
@@ -43,13 +65,13 @@ function sfp(){
 
     # Verify subcommand is present or print __sfp-fe-commands-help
     if [[ ${#} -eq 0 ]]; then
-        _sfp-dbug "No args received. Printing help"
+        _sfp-trace "No args received. Printing help"
         __sfp-fe-commands-help
         return 0
     fi
 
     # Set up sfp script source 
-    _sfp-dbug "User wants ${command}"
+    _sfp-trace "User wants ${command}"
     command="sfp-$(echo ${1} | sed 's/ /-/g')"
     # Shift to remove subcommand from its own args
     shift
@@ -60,19 +82,19 @@ function sfp(){
     fi
 
     # Source configuration file if it exists
-    _sfp-dbug "Sourcing config"
+    _sfp-trace "Sourcing config"
     [[ -f "${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf" ]] && source "${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf"
 
     # Source script and run its main function
-    _sfp-dbug "Sourcing ${command}"
+    _sfp-trace "Sourcing ${command}"
     source "${command}"
 
-    _sfp-dbug "Running '${command}' '"${@}"'"
+    _sfp-trace "Running '${command}' '"${@}"'"
     ${command} "${@}"
     retVal="${?}"
 
-    _sfp-dbug "Done ${command}"
+    _sfp-trace "Done ${command}"
     return ${retVal}
 }
 
-[[ $_ != $0 ]] || sfp
+[[ ${_} != ${0} ]] || sfp

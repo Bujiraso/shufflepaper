@@ -172,13 +172,13 @@ function __sfp-alter() {
 
     if [[ ! -z "${sqlChanges}" ]]; then
         sqlStmt="UPDATE Wallpapers SET ${sqlChanges%,} WHERE inode=${inode}"
-        echo "$(date +%Y-%m-%d-%T): ${subName}: Running ${sqlStmt}" >> "${logFile}"
+        _sfp-dbug "$(date +%Y-%m-%d-%T): ${subName}: Running ${sqlStmt}"
         sfp query "${sqlStmt}"
         if [[ ${?} -ne 0 ]]; then
-            echo "${subName}: Errors occurred updating ${wallURI} while running ${sqlStmt}" > >(tee -a "${logFile}" >&2)
+            _sfp-err "${subName}: Errors occurred updating ${wallURI} while running ${sqlStmt}"
         fi
     else
-        echo "$(date +%Y-%m-%d-%T): ${subName}: No changes to make" >> "${logFile}"
+        _sfp-dbug "$(date +%Y-%m-%d-%T): ${subName}: No changes to make"
     fi
 }
 

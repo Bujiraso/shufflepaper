@@ -61,7 +61,7 @@ function __sfp-change() {
         return 3
     fi
 
-    echo "$(date +%Y-%m-%d-%T): ${subName}: Wallpaper set to ${fpath}" >> ${logFile}
+    _sfp-dbug "$(date +%Y-%m-%d-%T): ${subName}: Wallpaper set to ${fpath}"
 }
 
 sfp-change () {

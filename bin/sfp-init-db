@@ -29,8 +29,8 @@ function __sfp-init-db() {
     # Source shufflepaper variables
 
     # Ensure data directory exists
-    if [[ ! -d "${SFP_DATA_HOME}" ]]; then
-        mkdir -p "${SFP_DATA_HOME}"
+    if [[ ! -d "${XDG_DATA_HOME}/shufflepaper/" ]]; then
+        mkdir -p "${XDG_DATA_HOME}/shufflepaper/"
     fi
 
     # Set up database

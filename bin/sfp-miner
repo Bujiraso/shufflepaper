@@ -22,12 +22,12 @@ subName="miner"
 function __sfp-miner() {
 
     diffFile=/tmp/inodeList.diff
-    inodeList="${SFP_DATA_HOME}"/inode.list
+    inodeList="${XDG_DATA_HOME}/shufflepaper/inode.list"
     tempList="/tmp/inode.list"
     txnFile=/tmp/"${subName}".txn
 
     # Ensure data directory exists
-    if [[ ! -d "${SFP_DATA_HOME}" ]]; then
+    if [[ ! -d "${XDG_DATA_HOME}/shufflepaper/" ]]; then
         sfp init-db
     fi
 
@@ -84,7 +84,7 @@ function __sfp-miner() {
             echo > "${txnFile}"
             # If deletion fails, don't press on -- user needs to work it out
             if [[ ${?} -ne 0 ]]; then
-                echo "${subName}: $(date +%D.%T) Failed to execute transaction" | tee -a ${logFile} >> /dev/stderr
+                _sfp-err "${subName}: $(date +%D.%T) Failed to execute transaction"
                 return 1
             fi
         fi
@@ -111,7 +111,7 @@ function __sfp-miner() {
         done <<< "$(find "${wallDir}" -newer "${SFP_DATABASE_FILE}" -type f \( -name "*png" -o -name "*jpg" \) -printf "%i\n" | sort)"
 
         if ! "${change}"; then
-            echo "${subName}: $(date +%D.%T) No changes to wallpapers detected." >> ${logFile}
+            _sfp-dbug "${subName}: $(date +%D.%T) No changes to wallpapers detected."
         fi
 
     else # If no inode list exists, add all wallpapers
@@ -126,7 +126,7 @@ function __sfp-miner() {
 
         # On fail: warn and return
         if [[ ${?} -ne 0 ]]; then
-            echo "${subName}: $(date +%D.%T) Failed to execute transaction" | tee -a ${logFile} >> /dev/stderr
+            _sfp-err "${subName}: $(date +%D.%T) Failed to execute transaction"
             return 1
         else
             echo "Transaction complete."
