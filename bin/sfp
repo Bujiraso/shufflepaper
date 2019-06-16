@@ -16,6 +16,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+export _SFP_LOG_FILE="${XDG_DATA_HOME}/shufflepaper/shufflepaper.log"
 # Err -> to user on stderr and log file
 function _sfp-err() {
     echo "${@}" | tee -a "${_SFP_LOG_FILE}" > /dev/stderr
@@ -48,7 +49,6 @@ EOS
 
 function sfp(){
     # Export logging commands
-    _SFP_LOG_FILE="${XDG_DATA_HOME}/shufflepaper/shufflepaper.log"
     export -f _sfp-err
     export -f _sfp-info
     export -f _sfp-dbug
@@ -82,10 +82,6 @@ function sfp(){
         return 3
     fi
 
-    # Source configuration file if it exists
-    _sfp-trace "Sourcing config"
-    [[ -f "${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf" ]] && source "${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf"
-
     # Source script and run its main function
     _sfp-trace "Sourcing ${command}"
     source "${command}"
@@ -99,3 +95,10 @@ function sfp(){
 }
 
 [[ ${_} != ${0} ]] || sfp "${@}"
+
+# Source configuration file if we haven't yet and it exists
+_sfp-trace "Sourcing config"
+if [[ -z ${SFP_CONFIG_SET+x} && -f "${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf" ]]; then
+   source "${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf"
+   export SFP_CONFIG_SET="done"
+fi
