@@ -25,6 +25,6 @@ The script is supposed to do nothing when sourced to enable more effective debug
 ## Basic Execution Rules
 In order to get your executable showing to sfp's front-end, do the following:
 * Make your file executable
-* Name it like "sfp-letters-and-hyphens" (matches `^sfp-[-a-Z]*$'`, no trailing '.sh' or other file extension)
+* Name it like "sfp-letters-and-hyphens" (matches `^sfp-[-a-Z]*$`, no trailing '.sh' or other file extension)
 * Add your executable to your path
 * Run sfp to see it magically show up or ask for help / file a bug
