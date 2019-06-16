@@ -27,7 +27,7 @@ function commands_help() {
 Usage: $(basename "${0}") COMMAND
 
 Available commands are:
-    $(compgen -c | grep 'sfp-' | sort | tr -d '\n\r' | sed 's/sfp-/, /g;s/^, //')
+    $(compgen -c | grep '^sfp-[a-Z\-]*$' | sort | tr -d '\n\r' | sed 's/sfp-/, /g;s/^, //')
 EOS
 }
 
@@ -44,7 +44,7 @@ fi
 # Verify subcommand is present or print commands_help
 if [[ ${#} -eq 0 ]]; then
     commands_help
-    exit 2
+    exit 0
 fi
 
 # Set up sfp script source 
