@@ -22,8 +22,9 @@ function _sfp-err() {
 }
 
 # Info -> to user and log file
+# Note that until we are not trafficking strings between scripts, we cannot print to stdout
 function _sfp-info() {
-    echo "${@}" | tee -a "${_SFP_LOG_FILE}"
+    _sfp-err "${@}" 
 }
 
 # Debug -> to log file only
@@ -33,7 +34,7 @@ function _sfp-dbug() {
 
 # Trace -> conditionally sent to both screen and log file
 function _sfp-trace() {
-    [[ ! -z ${SFP_DEBUG+x} ]] && echo "${@}" | tee -a "${_SFP_LOG_FILE}"
+    [[ ! -z ${SFP_TRACE+x} ]] && _sfp-err "${SFP_TRACE_DECORATION}${@}"
 }
 
 function __sfp-fe-commands-help() {
@@ -97,4 +98,4 @@ function sfp(){
     return ${retVal}
 }
 
-[[ ${_} != ${0} ]] || sfp
+[[ ${_} != ${0} ]] || sfp "${@}"
