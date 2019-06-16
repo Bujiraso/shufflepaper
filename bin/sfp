@@ -16,6 +16,9 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# Save this for later to tell if we are being sourced or run
+entryPoint=${_}
+
 export _SFP_LOG_FILE="${XDG_DATA_HOME}/shufflepaper/shufflepaper.log"
 # Err -> to user on stderr and log file
 function _sfp-err() {
@@ -94,7 +97,7 @@ function sfp(){
     return ${retVal}
 }
 
-[[ ${_} != ${0} ]] || sfp "${@}"
+[[ ${entryPoint} != ${0} ]] || sfp "${@}"
 
 # Source configuration file if we haven't yet and it exists
 _sfp-trace "Sourcing config"
