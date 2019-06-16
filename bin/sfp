@@ -16,11 +16,12 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-function dbug() {
+function _sfp-dbug() {
     [[ ! -z ${SFP_DEBUG+x} ]] && echo "${@}"
 }
+export -f _sfp-dbug
 
-function commands_help() {
+function __sfp-fe-commands-help() {
     cat <<EOS
 Usage: $(basename "${0}") COMMAND
 
@@ -29,45 +30,49 @@ $(compgen -c | grep '^sfp-[a-Z\-]*$' | sort | sed 's/sfp-/, /g;s/^, //' | column
 EOS
 }
 
-# Assert that sfp can be called by subcommands
-if ! which sfp 2> /dev/null > /dev/null; then
-    sourceDir="$(dirname "$(readlink -f "${0}")")"
-    if [[ ! -d "${sourceDir}" ]]; then
-        echo "Cannot find sfp's source dir to execute subcommands through. Try installing sfp to your path" > /dev/stderr
-        exit 1
+function sfp(){
+    # Assert that sfp can be called by subcommands
+    if ! which sfp 2> /dev/null > /dev/null; then
+        sourceDir="$(dirname "$(readlink -f "${0}")")"
+        if [[ ! -d "${sourceDir}" ]]; then
+            echo "Cannot find sfp's source dir to execute subcommands through. Try installing sfp to your path" > /dev/stderr
+            return 1
+        fi
+        export PATH="${PATH}:${sourceDir}"
     fi
-    export PATH="${PATH}:${sourceDir}"
-fi
 
-# Verify subcommand is present or print commands_help
-if [[ ${#} -eq 0 ]]; then
-    dbug "No args received. Printing help"
-    commands_help
-    exit 0
-fi
+    # Verify subcommand is present or print __sfp-fe-commands-help
+    if [[ ${#} -eq 0 ]]; then
+        _sfp-dbug "No args received. Printing help"
+        __sfp-fe-commands-help
+        return 0
+    fi
 
-# Set up sfp script source 
-dbug "User wants ${command}"
-command="sfp-$(echo ${1} | sed 's/ /-/g')"
-# Shift to remove subcommand from its own args
-shift
+    # Set up sfp script source 
+    _sfp-dbug "User wants ${command}"
+    command="sfp-$(echo ${1} | sed 's/ /-/g')"
+    # Shift to remove subcommand from its own args
+    shift
 
-if ! which "${command}" >/dev/null 2>/dev/null; then
-    echo "Invalid command ${command}" > /dev/stderr
-    exit 3
-fi
+    if ! which "${command}" >/dev/null 2>/dev/null; then
+        echo "Invalid command ${command}" > /dev/stderr
+        return 3
+    fi
 
-# Source configuration file if it exists
-dbug "Sourcing config"
-[[ -f "${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf" ]] && source "${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf"
+    # Source configuration file if it exists
+    _sfp-dbug "Sourcing config"
+    [[ -f "${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf" ]] && source "${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf"
 
-# Source script and run its main function
-dbug "Sourcing ${command}"
-source "${command}"
+    # Source script and run its main function
+    _sfp-dbug "Sourcing ${command}"
+    source "${command}"
 
-dbug "Running '${command}' '"${@}"'"
-${command} "${@}"
-retVal="${?}"
+    _sfp-dbug "Running '${command}' '"${@}"'"
+    ${command} "${@}"
+    retVal="${?}"
 
-dbug "Done ${command}"
-exit ${retVal}
+    _sfp-dbug "Done ${command}"
+    return ${retVal}
+}
+
+[[ $_ != $0 ]] || sfp

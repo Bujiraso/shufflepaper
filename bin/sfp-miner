@@ -85,7 +85,7 @@ function __sfp-miner() {
             # If deletion fails, don't press on -- user needs to work it out
             if [[ ${?} -ne 0 ]]; then
                 echo "${subName}: $(date +%D.%T) Failed to execute transaction" | tee -a ${logFile} >> /dev/stderr
-                exit 1
+                return 1
             fi
         fi
 
@@ -124,10 +124,10 @@ function __sfp-miner() {
         echo "Running update transaction"
         sfp query -f "${txnFile}"
 
-        # On fail: warn and exit
+        # On fail: warn and return
         if [[ ${?} -ne 0 ]]; then
             echo "${subName}: $(date +%D.%T) Failed to execute transaction" | tee -a ${logFile} >> /dev/stderr
-            exit 1
+            return 1
         else
             echo "Transaction complete."
         fi
@@ -136,7 +136,7 @@ function __sfp-miner() {
     fi
 
     rm "${txnFile}"
-    exit 0
+    return 0
 }
 
 function sfp-miner() {

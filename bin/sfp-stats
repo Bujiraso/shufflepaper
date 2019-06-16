@@ -29,7 +29,7 @@ function __sfp-stats-readDB() {
     if [[ "$(sfp query 'SELECT count(*) FROM Wallpapers WHERE file_path="'"${wallURI}"'"')" -eq 0 ]]; then
         if [[ ! -f "${wallURI}" ]]; then
             # Wall does not exist.
-            exit 1
+            return 1
         fi
         # File path must need updating
         list=$(ls -li "${wallURI}")
@@ -40,7 +40,7 @@ function __sfp-stats-readDB() {
         result="$(sfp query "SELECT * FROM Wallpapers WHERE inode=${inode}")"
         if [[ -z "${result}" ]]; then
             echo "${subName}: Error finding wallpaper"
-            exit 1
+            return 1
         fi
     else
         result="$(sfp query "SELECT inode, hash, file_path, width, height, selected, view_count, star_rating, user_comments, view_mode FROM Wallpapers WHERE file_path=\"${wallURI}\"")"
@@ -76,7 +76,7 @@ function __sfp-stats() {
                 ;;
             "h") 
                 __sfp-stats-help
-                exit 0
+                return 0
                 ;;
             "n") noheader=true
                 ;;
@@ -91,7 +91,7 @@ function __sfp-stats() {
             echo "${output}"
         fi
     else
-        exit "${ret}"
+        return "${ret}"
     fi
 }
 

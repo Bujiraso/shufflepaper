@@ -51,7 +51,7 @@ function __sfp-alter() {
                 wallURI=${!count}
             else
                 echo "${subName}: Wall file cannot be set twice." >&2
-                exit 3
+                return 3
             fi
         fi
         count=$((count + 1))
@@ -62,7 +62,7 @@ function __sfp-alter() {
 
     if [[ "${#}" -ne 0 && -z "${inode}" ]]; then
         echo "${subName}: Fatal error: no inode found for ${wallURI}" >&2
-        exit 4
+        return 4
     fi
 
     # If the file path is currently wrong, find the file by inode
@@ -74,7 +74,7 @@ function __sfp-alter() {
             wallURI="${newURI}"
         else
             echo "${subName}: Cannot find file ${file} or inode ${inode}" >&2
-            exit 5
+            return 5
         fi
     fi
 
@@ -92,13 +92,13 @@ function __sfp-alter() {
                 dims=($(sfp dims -n -f "${wallURI}"))
                 if [[ ${dims[0]} -eq 0 || ${dims[1]} -eq 0 ]]; then
                     echo "${subName}: Cannot get dimensions for ${wallURI}." >&2
-                    exit 6
+                    return 6
                 fi
                 sqlChanges="${sqlChanges}"" width = ${dims[0]}, height = ${dims[1]},"
                 ;;
             "h")
                 __alter-help
-                exit 0
+                return 0
                 ;;
             "m")
                 OPTIONS="centered scaled spanned zoom stretched wallpaper"
@@ -114,7 +114,7 @@ function __sfp-alter() {
                             ;;
                         *) #Invalid view option
                             echo "${subName}: Invalid picture option ${OPTARG}" >&2
-                            exit 8
+                            return 8
                             ;;
                     esac
                 fi
@@ -127,7 +127,7 @@ function __sfp-alter() {
                     sqlChanges="${sqlChanges}"" star_rating = ${OPTARG},"
                 else
                     echo "${subName}: Invalid star rating ${OPTARG}" >&2
-                    exit 10
+                    return 10
                 fi
                 ;;
             "t")
@@ -135,7 +135,7 @@ function __sfp-alter() {
                     "0"|"false"|"off"|"f"|"no"|"F"|"unselected") sel=0 ;;
                     "1"|"true"|"on"|"t"|"yes"|"T"|"selected") sel=1 ;;
                     *) echo "${subName}: Invalid selectedness ${OPTARG}" >&2
-                        exit 7
+                        return 7
                         ;;
                 esac
                 sqlChanges="${sqlChanges}"" selected = ${sel},"
@@ -156,16 +156,16 @@ function __sfp-alter() {
                     sqlChanges="${sqlChanges}"" view_count = ${OPTARG},"
                 else
                     echo "${subName}: Cannot update view count on non-integer." >&2
-                    exit 9
+                    return 9
                 fi
                 ;;
             \?) # Invalid option
                 echo "${subName}: Invalid option -${OPTARG}" >&2
-                exit 1
+                return 1
                 ;;
             :)
                 echo "${subName}: Option -${OPTARG} requires an argument." >&2
-                exit 2
+                return 2
                 ;;
         esac
     done

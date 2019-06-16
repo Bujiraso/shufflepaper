@@ -22,7 +22,7 @@ function __sfp-init-db() {
 
     if [[ -z "${XDG_CONFIG_HOME}" || ! -d "${XDG_CONFIG_HOME}" ]]; then
         echo "Cannot install without XDG_CONFIG_HOME set to a valid directory"
-        exit 4
+        return 4
     fi
 
     install -Dm 644 "${confDir}/shufflepaper.conf" "${XDG_CONFIG_HOME}/shufflepaper"

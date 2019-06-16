@@ -22,11 +22,11 @@ OPTIONS="centered scaled spanned zoom stretched wallpaper"
 function __sfp-option-help() {
     cat << EOS
 Usage: ${subName} [OPTIONS...] <ARGUMENT>
-    -h        Print this help message and exit
+    -h        Print this help message and return
     -n        No update of wallpaper in DB
 Argument can be one of: ${OPTIONS}
 EOS
-    exit 0
+    return 0
 }
 
 function __sfp-option() {
@@ -57,7 +57,7 @@ function __sfp-option() {
             ;;
         *) #Invalid view option
             echo "${subName}: Invalid argument - ${arg}" >&2
-            exit 1
+            return 1
             ;;
     esac
 }

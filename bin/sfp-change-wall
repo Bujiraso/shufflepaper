@@ -23,7 +23,7 @@ function __sfp_prefixURI() {
     pfpath="${1}"
     if [[ ! -f  "$(echo "${pfpath##*:\/\/}" | sed s/^\'// | sed s/\'$//)" ]]; then
         echo >&2 "${subName}: File \"${pfpath}\" does not exist"
-        exit 2
+        return 2
     fi
 
     if [[ ! "${pfpath}" = *"file://"* ]]; then
@@ -37,7 +37,7 @@ function __sfp-change() {
 
     if [[ ${#} -eq 0 ]]; then
         echo >&2 "${subName}: No args given. Exiting without change."
-        exit 1
+        return 1
     fi
 
     fpath="${1}"
@@ -52,13 +52,13 @@ function __sfp-change() {
         DISPLAY=:0 gsettings set org.mate.background picture-filename "${fpath}"
     elif pgrep 'gnome-shell$' > /dev/null; then
         if [[ -z ${DBUS_SESSION_BUS_ADDRESS+x} ]]; then
-            export $(dbus-launch --exit-with-session gnome-session)
+            export $(dbus-launch --return-with-session gnome-session)
         fi
         pfpath=$(__sfp_prefixURI "${fpath}")
         DISPLAY=:0 gsettings set org.gnome.desktop.background picture-uri "${pfpath}"
     else
         echo >&2 "${subName}: Cannot read for session ${DESKTOP_SESSION}"
-        exit 3
+        return 3
     fi
 
     echo "$(date +%Y-%m-%d-%T): ${subName}: Wallpaper set to ${fpath}" >> ${logFile}

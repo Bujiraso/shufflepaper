@@ -34,7 +34,7 @@ function __sfp-get-sql-stmt-buildInsert() {
     dims=$(sfp dims -n -f "${file}")
     if [[ ${?} -ne 0 ]]; then
         echo "${subName}: Failed to build insert for ${1}" > /dev/stderr
-        exit 2
+        return 2
     fi
     string="${string}""$(echo ${dims} | tr -d '\n' | sed 's/ /, /'), "
     # Selectedness
@@ -70,7 +70,7 @@ function __sfp-get-sql-stmt() {
     # Check args
     if [[ "${#}" -eq 0 ]]; then
         echo >&2 "${subName}: Missing args"
-        exit 1
+        return 1
     fi
 
     # Setup vars

@@ -10,7 +10,7 @@ Simply take the following example and expand on it
 # your script
 function sfp-your-script(){
     echo hey
-    exit 0
+    return 0
 }
 ```
 
@@ -19,6 +19,7 @@ The items of note here are the following:
 * A comment helps anyone know what file they are in. You can throw copyright+license here too
 * Your script should have a function of the same name as the script (must be identical), which will be considered your main function
 * Your script should be sourceable and *must do nothing* when it is sourced. Otherwise things are gonna get weird.
+* Do *not* exit from your function, as it may quit all of sfp (or bash) -- instead use `return`
 
 The script is supposed to do nothing when sourced to enable more effective debugging (for as much as you can debug BASH...)
 

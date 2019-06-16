@@ -35,7 +35,7 @@ function __sfp-get-uri() {
         fi
     else
         echo >&2 "${subName}: Cannot read for session ${DESKTOP_SESSION}"
-        exit 2
+        return 2
     fi
     echo "${url}"
 }

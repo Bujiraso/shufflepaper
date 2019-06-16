@@ -2,7 +2,7 @@
 # make file to deploy shufflepaper to a chosen directory
 
 if [[ ${#} -eq 0 ]]; then
-    echo "Usage: make.sh INSTALL_DIR"
+    echo "Usage: ${0} INSTALL_DIR"
     exit 1
 fi
 

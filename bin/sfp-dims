@@ -35,7 +35,7 @@ function __sfp-dims() {
             f) wall=${OPTARG}
                 ;;
             h) 
-                exit 0
+                return 0
                 ;;
             n) noX=true
                 ;;
@@ -53,14 +53,14 @@ function __sfp-dims() {
     # Check file exists
     if [[ ! -f ${wall} ]]; then
         echo "${subName}: File not found  - \"${wall}\""
-        exit 1
+        return 1
     fi
 
     if [[ "${wall}" == *"png" ]]; then
         info=($(file "${wall}" 2> /dev/null | sed 's/^.*PNG image data, //' | sed 's/,.*$//' | sed 's/ x//'))
         if [[ ${?} -ne 0 ]]; then
             echo "${subName}: Invalid image file \"${wall}\""> /dev/stderr
-            exit 2
+            return 2
         fi
         width=${info[0]}
         height=${info[1]}
@@ -68,7 +68,7 @@ function __sfp-dims() {
         info=($(file "${wall}" 2> /dev/null | sed 's/^.*GIF image data, //' | sed 's/,.*$//' | sed 's/ x//'))
         if [[ ${?} -ne 0 ]]; then
             echo "${subName}: Invalid image file \"${wall}\""> /dev/stderr
-            exit 3
+            return 3
         fi
         width=${info[1]}
         height=${info[2]}
@@ -76,7 +76,7 @@ function __sfp-dims() {
         info=($(file -P name=50 "${wall}" | rev | cut -d, -f 2 | tr -d '[[:space:]]' | rev | sed 's/x/ /' ))
         if [[ ${?} -ne 0 ]]; then
             echo "${subName}: Invalid image file \"${wall}\""> /dev/stderr
-            exit 4
+            return 4
         fi
         width=${info[0]}
         height=${info[1]}

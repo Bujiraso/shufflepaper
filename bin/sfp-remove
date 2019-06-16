@@ -20,7 +20,7 @@ function __sfp-remove() {
     # Check args
     if [[ ${#} -eq 0 ]]; then
         echo "${me}: Missing argument. An inode or file path is required."
-        exit 1
+        return 1
     fi
 
     # Setup vars
@@ -43,7 +43,7 @@ function __sfp-remove() {
     # Report any errors
     if [[ ${?} -ne 0 ]]; then
         echo "${me}: Failed to remove wallpaper using command: ${string}"
-        exit 2
+        return 2
     fi
 }
 
