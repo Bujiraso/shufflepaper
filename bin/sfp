@@ -75,8 +75,8 @@ function sfp(){
     fi
 
     # Set up sfp script source 
-    _sfp-trace "User wants ${command}"
     command="sfp-$(echo ${1} | sed 's/ /-/g')"
+    _sfp-trace "User wants ${command}"
     # Shift to remove subcommand from its own args
     shift
 

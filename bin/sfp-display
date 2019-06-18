@@ -16,11 +16,22 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-subName="change"
+subName="display"
+
+function __sfp-display-help() {
+    OPTIONS="centered scaled spanned zoom stretched wallpaper"
+    cat <<EOS
+Usage: sfp ${subName} FILE                   Set the wallpaper to the given file
+       sfp ${subName} (-o|--option) OPTION   Set the view mode of the wallpaper
+           Argument can be one of: ${OPTIONS}
+       sfp ${subName} (-h|--help)            Print this help message
+EOS
+}
 
 #Check that the file is prefixed by "file://"
 function __sfp_prefixURI() {
     pfpath="${1}"
+    _sfp-trace "Prepending file:// to ${pfpath}"
     if [[ ! -f  "$(echo "${pfpath##*:\/\/}" | sed s/^\'// | sed s/\'$//)" ]]; then
         echo >&2 "${subName}: File \"${pfpath}\" does not exist"
         return 2
@@ -34,23 +45,19 @@ function __sfp_prefixURI() {
 export -f __sfp_prefixURI
 
 function __sfp-display() {
-
-    if [[ ${#} -eq 0 ]]; then
-        echo >&2 "${subName}: No args given. Exiting without change."
-        return 1
-    fi
-
     fpath="${1}"
-
-
+    _sfp-trace "Using ${fpath} as background to set"
     # Determine desktop session and change wallpaper
     if pgrep cinnamon > /dev/null; then
+        _sfp-trace "Setting cinnamon background"
         pfpath=$(__sfp_prefixURI "${fpath}")
         # TODO: This won't always be DISPLAY=:0
         DISPLAY=:0 gsettings set org.cinnamon.desktop.background picture-uri "${pfpath}"
     elif pgrep mate-session > /dev/null; then
+        _sfp-trace "Setting mate background"
         DISPLAY=:0 gsettings set org.mate.background picture-filename "${fpath}"
     elif pgrep 'gnome-shell$' > /dev/null; then
+        _sfp-trace "Setting gnome background"
         if [[ -z ${DBUS_SESSION_BUS_ADDRESS+x} ]]; then
             export $(dbus-launch --return-with-session gnome-session)
         fi
@@ -64,6 +71,60 @@ function __sfp-display() {
     _sfp-dbug "$(date +%Y-%m-%d-%T): ${subName}: Wallpaper set to ${fpath}"
 }
 
-sfp-display () {
-    __sfp-display "${@}"
+function __sfp-update-gnome-display-mode() {
+    if [[ -z ${DBUS_SESSION_BUS_ADDRESS+x} ]]; then
+        export $(dbus-launch --return-with-session gnome-session)
+    fi
+    DISPLAY=:0 gsettings set org.gnome.desktop.background picture-options "${1}"
+}
+
+function __sfp-option() {
+    _sfp-trace "Checking for extra hidden args"
+    if [[ "${1}" == "-n" || "${1}" == "--no-update" ]]; then
+        _sfp-trace "Found hidden arg for --no-update."
+        noUpdate=1
+        shift
+    fi
+
+    mode=${1}
+    case "${mode}" in
+        "centered"|"scaled"|"spanned"|"zoom"|"stretched"|"wallpaper")
+            _sfp-trace "Requesting DE (currently gnome...) to update display to ${mode}"
+            __sfp-update-gnome-display-mode "${mode}"
+            if [[ -z "${noUpdate}" ]]; then
+                _sfp-trace "Updating database"
+                sfp alter -m "${mode}"
+            else
+                _sfp-trace "Skipping database update due to -n switch"
+            fi
+            ;;
+        *) #Invalid view option
+            echo "${subName}: Invalid argument - ${mode}" >&2
+            return 1
+            ;;
+    esac
+}
+
+function sfp-display () {
+    if [[ ${#} -eq 0 ]]; then
+        echo >&2 "${subName}: No args given. Exiting without change."
+        __sfp-display-help
+        return 1
+    fi
+
+    if [[ "${1}" == "-o" || "${1}" == "--option" ]]; then
+        _sfp-trace "Received '-o' switch"
+        if [[ ${#} -ne 2 ]]; then
+            _sfp-err "${subName}: --option argument requires only one argument, received $(($# - 1))"
+            return 2
+        fi
+        shift # remove subcommand from its own args
+        __sfp-option "${@}"
+    elif [[ "${1}" == "-h" || "${1}" == "--help" ]]; then
+        __sfp-display-help
+    else
+        _sfp-trace "Attempting to set wallpaper to ${@}"
+        __sfp-display "${@}"
+    fi
+    return 0
 }

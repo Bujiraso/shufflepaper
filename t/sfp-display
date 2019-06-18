@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+# gsettings interceptor
+function gsettings() {
+    if [[ "${1}" == "set" ]]; then
+        if [[ "${2}" == "org.gnome.desktop.background" ]]; then
+            if [[ "${3}" == "picture-uri" ]]; then
+                if [[ -f "${4/file:\/\//}" ]]; then
+                    echo valid-uri
+                fi
+            fi
+        fi
+    fi
+}
+export -f gsettings
+
+# dbus-launch interceptor
+function dbus-launch(){
+    echo dbus-launch called
+}
+export -f dbus-launch
+
+# Set up a fake jpg to use
+testjpg="/tmp/sfp-test/fake.jpg"
+dd if=/dev/urandom of="${testjpg}" bs=512 count=2 2> /dev/null
+
+bash -c "sfp display \"${testjpg}\"" | grep valid-uri > /dev/null
