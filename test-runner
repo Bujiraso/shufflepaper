@@ -18,27 +18,6 @@ fi
 # Move out re-run arg
 test "${1}" == "--again" && shift
 
-
-# logNewTest: Logs test case count
-i=0
-function logNewTest() {
-    i=$((i + 1)) && echo "Executing test ${i}: ${1}"
-}
-export -f logNewTest
-
-# classRunner: Runs all of the test cases in a class
-function classRunner() {
-    retVal=
-    for test in ${tests};  do
-        logNewTest "${test}" && "${test}" && continue
-        retVal=${?}
-        echo "=== FAILURE: '${test}' test failed (return value ${retVal})"
-    done
-    return ${retVal}
-}
-export -f classRunner
-
-
 TEST_DIR="$(readlink -f "$(dirname "${0}")/t/")"
 
 # Check test class arg makes sense {
@@ -71,10 +50,19 @@ specificTestEnv="${TEST_DIR}/.${testBasename}-setup"
 test -f "${specificTestEnv}" && source "${specificTestEnv}"
 # }
 
-# Run the test class! {
+# Run the test class {
 echo "Testing class: t/${testBasename}..."
 source "${testClass}"
-classRunner
+i=0
+retVal=
+for testCase in ${testCases};  do
+    i=$((i + 1)) && echo "Executing test case ${i}: ${testCase}"
+    "${testCase}" && continue
+    retVal=${?}
+    echo "=== FAILURE: '${testCase}' test case failed (return value ${retVal})"
+done
 
 "${TEST_DIR}/.teardown"
 # }
+
+exit ${retVal}

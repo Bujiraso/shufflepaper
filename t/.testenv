@@ -17,8 +17,7 @@ mkdir -p "${XDG_DATA_HOME}/shufflepaper"
 # }
 
 function add() {
-    tests="${tests} ${1}"
-    export tests
+    export testCases="${testCases} ${1}"
 }
 export -f add
 
