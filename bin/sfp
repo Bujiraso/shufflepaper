@@ -46,7 +46,7 @@ function __sfp-fe-commands-help() {
 Usage: $(basename "${0}") COMMAND
 
 Available subcommands are:
-$(compgen -c | grep '^sfp-[a-Z\-]*$' | sort | sed 's/sfp-/, /g;s/^, //' | column -c 80 | sed 's/^/\t/') 
+$(compgen -c | grep -- '^sfp-[[:alpha:]-]*$' | sort | sed 's/sfp-/, /g;s/^, //' | column -c 80 | sed 's/^/\t/') 
 EOS
 }
 
@@ -75,8 +75,8 @@ function sfp(){
     fi
 
     # Set up sfp script source 
-    _sfp-trace "User wants ${command}"
     command="sfp-$(echo ${1} | sed 's/ /-/g')"
+    _sfp-trace "User wants ${command}"
     # Shift to remove subcommand from its own args
     shift
 

@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+export uriTestPass="valid-uri"
+export optTestPass="options received"
+
+# gsettings interceptor
+function gsettings() {
+    if [[ "${3}" == "picture-uri" ]]; then
+        if [[ -f "${4/file:\/\//}" ]]; then
+            echo "${uriTestPass}"
+        fi
+    elif [[ "${3}" == "picture-options" ]]; then
+        if [[ ! -z "${4}" ]]; then
+            echo "${optTestPass}"
+        fi
+    fi
+}
+export -f gsettings
+
+# dbus-launch interceptor
+function dbus-launch(){
+    echo "DBUS_LAUNCH=TEST"
+}
+export -f dbus-launch
+
+# pgrep interceptor
+function pgrep() {
+    if [[ ${1} =~ ^.*gnome.*$ ]]; then
+        return 0
+    else
+        return -1
+    fi
+}
+export -f pgrep
+
+# Intercept specific sfp calls (must precede existing path) { 
+export testBin="/tmp/display-t/"
+mkdir -p "${testBin}"
+export PATH="${testBin}:${PATH}"
+# }
+
+function mock() {
+    mockScript="${testBin}/sfp-${1}"
+    cat > "${mockScript}" <<EOS
+#!/usr/bin/env bash
+echo Alter called
+EOS
+    chmod +x "${mockScript}"
+}
+mock alter

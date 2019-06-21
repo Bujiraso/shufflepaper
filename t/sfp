@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# sfp-fe (front-end) test
+
+# Source global test env arg and test class env
+test -f "${1}" && source "${1}" || echo "Could not source test environment" 
 
 # Command must exist
 bash -c "sfp" > /dev/null
