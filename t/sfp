@@ -1,23 +1,33 @@
 #!/usr/bin/env bash
 # sfp-fe (front-end) test
 
-# Command must exist
-bash -c "sfp" > /dev/null
+commandMustExist(){
+    bash -c "sfp" > /dev/null
+}
+add commandMustExist
 
-# Command must list subcommands
-bash -c "sfp" | grep 'subcommands' > /dev/null
+sfpMustListSubcommands() {
+    bash -c "sfp" | grep 'subcommands' > /dev/null
+}
+add sfpMustListSubcommands
 
-# Command must list built in subcommands, e.g. stats
-bash -c "sfp" | grep 'stats' > /dev/null
+sfpMustListBuiltins() {
+    # stats is a built-in
+    bash -c "sfp" | grep 'stats' > /dev/null
+}
+add sfpMustListBuiltins
 
-# Sub commands (extensions) must be callable
-testSubc="/tmp/sfp-test/sfp-test"
-mkdir -p "$(dirname "${testSubc}")"
-cat >> ${testSubc} <<EOS
+mockExtensionsMustWork() {
+    # Sub commands (extensions) must be callable
+    testSubc="/tmp/sfp-test/sfp-test"
+    mkdir -p "$(dirname "${testSubc}")"
+    cat >> ${testSubc} <<EOS
 #!/usr/bin/env bash
 function sfp-test() {
     echo Tests are magic
 }
 EOS
-chmod +x "${testSubc}"
-bash -c "export 'PATH=${PATH}:$(dirname "${testSubc}")'; sfp test"  | grep magic > /dev/null
+    chmod +x "${testSubc}"
+    bash -c "export 'PATH=${PATH}:$(dirname "${testSubc}")'; sfp test"  | grep magic > /dev/null
+}
+add mockExtensionsMustWork

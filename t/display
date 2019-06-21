@@ -15,5 +15,3 @@ mode(){
     bash -c "sfp display -o zoom" | grep "${optTestPass}" > /dev/null
 }
 add mode
-
-testRunner

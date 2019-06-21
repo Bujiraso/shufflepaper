@@ -1,18 +1,38 @@
 #!/usr/bin/env bash
 # test-runner
+# Usage: $ test-runner TEST_CLASS_PATH
+#  or just use ...
+# Usage: $ ./make test TEST_CLASS_PATH
 
-name=test-runner
-TEST_DIR="$(readlink -f "$(dirname "${0}")/t/")"
-
+# Guard against running in dirty environments
 if [[ $(env | wc -l) -gt 5 ]]; then
-    echo "ERR: Test environment does not look empty." > /dev/stderr
-    echo "Usage: $ env -i ${name} TEST_CLASS_PATH"
-    echo " or just use ... "
-    echo "Usage: $ ./make test TEST_CLASS_PATH"
-    exit 12
+    echo "WARN: Test env is dirty. Re-running in empty env" > /dev/stderr
+    env -i "${0}" "${@}"
+    exit ${?}
 fi
 
-testClass="$(readlink -f "${1}")" 
+# Logs test case count
+i=0
+function logNewTest() {
+    i=$((i + 1)) && echo "Executing test ${i}: ${1}"
+}
+export -f logNewTest
+
+function classRunner() {
+    retVal=
+    for test in ${tests};  do
+        logNewTest "${test}" && "${test}" && continue
+        retVal=${?}
+        echo "=== FAILURE: '${test}' test failed (return value ${retVal})"
+    done
+    exit ${retVal}
+}
+export -f classRunner
+
+
+TEST_DIR="$(readlink -f "$(dirname "${0}")/t/")"
+
+testClass="$(readlink -f "${1}")"
 if [[ ! -f "${testClass}" ]]; then
     echo "Cannot find test class" > /dev/stderr
     exit 35
@@ -33,10 +53,11 @@ else
 fi
 
 testBasename=$(basename "${testClass}")
-specificTestEnv="${TEST_DIR}/.${testBasename}-setup" 
+specificTestEnv="${TEST_DIR}/.${testBasename}-setup"
 test -f "${specificTestEnv}" && source "${specificTestEnv}"
 
 echo "Testing class: t/${testBasename}..."
-"${testClass}"
+source "${testClass}"
+classRunner
 
 "${TEST_DIR}/.teardown"

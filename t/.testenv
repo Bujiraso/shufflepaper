@@ -16,32 +16,13 @@ export XDG_DATA_HOME=/tmp/sfp-test-logs/
 mkdir -p "${XDG_DATA_HOME}/shufflepaper"
 # }
 
-# =======  Test Helpers {
-# Logs test case count
-i=0
-function logNewTest() {
-    i=$((i + 1)) && echo "Executing test ${i}: ${1}"
-}
-export -f logNewTest
-
-tests=
 function add() {
     tests="${tests} ${1}"
+    export tests
 }
 export -f add
 
-function testRunner() {
-    retVal=
-    for test in ${tests};  do
-        logNewTest "${test}" && "${test}" && continue
-        retVal=${?}
-        echo "=== FAILURE: '${test}' test failed (return value ${retVal})"
-    done
-    exit ${retVal}
-}
-export -f testRunner
-
-
+# =======  Test Helpers {
 function mock() {
     export mockScript="${MOCK_BIN_PATH}/sfp-${1}"
     contents=${2:-echo ${1} called}

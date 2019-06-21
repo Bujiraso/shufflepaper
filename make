@@ -21,9 +21,13 @@ install() {
 
 function test() {
     # Test Range is the files to test
-    testRange="${1}"
+    if [[ ! -z ${1+x} ]]; then
+        testRange="$(readlink -f "${1}")"
+    else
+        testRange=$(readlink -f "${BASE_DIR}"/t/*)
+    fi
 
-    for testFile in ${testRange:-"${BASE_DIR}"/t/*}; do
+    echo "${testRange}" | while read testFile; do
         # Skip directories and test env's
         if [[  -d "${testFile}" || ! -x "${testFile}" ]]; then
             continue
@@ -52,4 +56,4 @@ fi
 command=${1}
 shift
 ${command} "${@}"
-# } 
+# }

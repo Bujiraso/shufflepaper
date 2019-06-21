@@ -6,5 +6,3 @@ nothingRunning_err() {
     (bash -c "sfp get-uri" 2>&1) | grep 'Cannot read' > /dev/null
 }
 add nothingRunning_err
-
-testRunner
