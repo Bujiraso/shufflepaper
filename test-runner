@@ -4,12 +4,19 @@
 #  or just use ...
 # Usage: $ ./make test TEST_CLASS_PATH
 
-# Guard against running in dirty environments
+# Guard against running in dirty environments (but do not infinite loop)
 if [[ $(env | wc -l) -gt 5 ]]; then
-    echo "WARN: Test env is dirty. Re-running in empty env" > /dev/stderr
-    env -i "${0}" "${@}"
-    exit ${?}
+    if [[ ${#} -lt 1 || "${1}" != "--again" ]]; then
+        echo "WARN: Test env is dirty. Re-running in empty env" > /dev/stderr
+        env -i "${0}" --again "${@}"
+        exit ${?}
+    else
+        echo "Infinite loop detected on hidden option. Repair env or script."
+        exit -1
+    fi
 fi
+# Move out re-run arg
+test "${1}" == "--again" && shift
 
 # Logs test case count
 i=0
@@ -25,7 +32,7 @@ function classRunner() {
         retVal=${?}
         echo "=== FAILURE: '${test}' test failed (return value ${retVal})"
     done
-    exit ${retVal}
+    return ${retVal}
 }
 export -f classRunner
 
