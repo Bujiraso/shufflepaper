@@ -31,6 +31,7 @@ function pgrep() {
         return -1
     fi
 }
+export -f pgrep
 
 # Intercept specific sfp calls (must precede existing path) { 
 export testBin="/tmp/display-t/"
