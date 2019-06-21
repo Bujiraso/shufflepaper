@@ -20,17 +20,28 @@ install() {
 }
 
 function test() {
-    # Put the bin dir here at the start of the path to ensure intercepting of user's config
-    for testFile in "${myDir}"/t/*; do
-        "${testFile}"
+    # Test Range is the files to test
+    testRange="${1}"
+
+    testEnv="${myDir}/.testenv"
+
+    for testFile in ${testRange:-"${myDir}"/t/*}; do
+        # Skip directories and test env's
+        if [[  -d "${testFile}" || ! -x "${testFile}" ]]; then
+            continue
+        fi
+
+        echo "Testing class: $(basename "${testFile}") ... "
+        env -i "$(readlink -f "${testFile}")" "${testEnv}"
         testResult=${?}
         if [[ ${testResult} -ne 0 ]]; then
-            echo "== TEST FAILED ==" > /dev/stderr
-            echo "The failed test case is t/$(basename "${testFile}")" > /dev/stderr
+            echo "== TESTS FAILED ==" > /dev/stderr
+            echo "The failed test class is t/$(basename "${testFile}")" > /dev/stderr
             return ${testResult}
         fi
+        echo
     done
-    echo "PASS"
+    echo "== TESTS PASS =="
 }
 
 # Main logic {

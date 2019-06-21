@@ -46,7 +46,7 @@ function __sfp-fe-commands-help() {
 Usage: $(basename "${0}") COMMAND
 
 Available subcommands are:
-$(compgen -c | grep '^sfp-[a-Z\-]*$' | sort | sed 's/sfp-/, /g;s/^, //' | column -c 80 | sed 's/^/\t/') 
+$(compgen -c | grep -- '^sfp-[[:alpha:]-]*$' | sort | sed 's/sfp-/, /g;s/^, //' | column -c 80 | sed 's/^/\t/') 
 EOS
 }
 
