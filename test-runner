@@ -18,13 +18,15 @@ fi
 # Move out re-run arg
 test "${1}" == "--again" && shift
 
-# Logs test case count
+
+# logNewTest: Logs test case count
 i=0
 function logNewTest() {
     i=$((i + 1)) && echo "Executing test ${i}: ${1}"
 }
 export -f logNewTest
 
+# classRunner: Runs all of the test cases in a class
 function classRunner() {
     retVal=
     for test in ${tests};  do
@@ -39,6 +41,7 @@ export -f classRunner
 
 TEST_DIR="$(readlink -f "$(dirname "${0}")/t/")"
 
+# Check test class arg makes sense {
 testClass="$(readlink -f "${1}")"
 if [[ ! -f "${testClass}" ]]; then
     echo "Cannot find test class" > /dev/stderr
@@ -50,7 +53,9 @@ elif [[ "$(readlink -f "$(dirname "${testClass}")")" != "${TEST_DIR}" ]]; then
     echo "Test not in test directory. Exiting to be safe" > /dev/stderr
     exit 172
 fi
+# }
 
+# Source global test env {
 globalTestEnv="${TEST_DIR}/.testenv"
 if [[ -f "${globalTestEnv}" ]]; then
     source "${globalTestEnv}"
@@ -58,13 +63,18 @@ else
     echo "Could not source global test env"
     exit 209
 fi
+# }
 
+# Source test class's specific test env iff it exists {
 testBasename=$(basename "${testClass}")
 specificTestEnv="${TEST_DIR}/.${testBasename}-setup"
 test -f "${specificTestEnv}" && source "${specificTestEnv}"
+# }
 
+# Run the test class! {
 echo "Testing class: t/${testBasename}..."
 source "${testClass}"
 classRunner
 
 "${TEST_DIR}/.teardown"
+# }
