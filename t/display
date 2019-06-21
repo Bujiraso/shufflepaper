@@ -11,6 +11,7 @@ source "${0/\/t\///t/.}-setup" || exit 1
 uri() {
     # Set up a fake jpg to use
     testjpg="/tmp/sfp-test/fake.jpg"
+    mkdir -p $(dirname "${testjpg}")
     dd if=/dev/urandom of="${testjpg}" bs=512 count=2 2> /dev/null
     bash -c "sfp display \"${testjpg}\"" | grep "${uriTestPass}" > /dev/null
 }
