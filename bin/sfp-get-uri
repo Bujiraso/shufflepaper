@@ -17,13 +17,18 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 subName="get-uri"
+
 function __sfp-get-uri() {
+    _sfp-trace "Getting current URI based on DE"
     # Get background
     if [ $(pgrep cinnamon | wc -l) -ne 0 ]; then
+        _sfp-trace "Found cinnamon running"
         url=$(gsettings get org.cinnamon.desktop.background picture-uri | cut -c9- | rev | cut -c2- | rev)
     elif [ $(pgrep mate-session | wc -l) -ne 0 ]; then
+        _sfp-trace "Found mate running"
         url=$(gsettings get org.mate.background picture-filename | cut -c2- | rev | cut -c2- | rev)
     elif [ $(pgrep gnome | wc -l) -ne 0 ]; then
+        _sfp-trace "Found gnome running"
         export $(dbus-launch)
         urlUncut=$(gsettings get org.gnome.desktop.background picture-uri)
         if [[ "${urlUncut}" == "'file://"* || "${urlUncut}" == \"file://* ]]; then
@@ -34,7 +39,8 @@ function __sfp-get-uri() {
             url="${urlUncut}"
         fi
     else
-        echo >&2 "${subName}: Cannot read for session ${DESKTOP_SESSION}"
+        _sfp-trace "Could not find any compatible DE running"
+        _sfp-err "${subName}: Cannot read for session ${DESKTOP_SESSION}"
         return 2
     fi
     echo "${url}"

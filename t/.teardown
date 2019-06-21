@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# Safely discard mock bin path (do not ever run on /...)
+test ! -z "${MOCK_BIN_PATH+x}" && test $(readlink -f "${MOCK_BIN_PATH}") != "/" && rm -rf "${MOCK_BIN_PATH}"

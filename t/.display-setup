@@ -33,18 +33,4 @@ function pgrep() {
 }
 export -f pgrep
 
-# Intercept specific sfp calls (must precede existing path) { 
-export testBin="/tmp/display-t/"
-mkdir -p "${testBin}"
-export PATH="${testBin}:${PATH}"
-# }
-
-function mock() {
-    mockScript="${testBin}/sfp-${1}"
-    cat > "${mockScript}" <<EOS
-#!/usr/bin/env bash
-echo Alter called
-EOS
-    chmod +x "${mockScript}"
-}
 mock alter

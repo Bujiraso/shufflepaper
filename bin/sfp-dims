@@ -29,12 +29,11 @@ Usage: ${subName} [OPTION]
 EOS
 }
 function __sfp-dims() {
-
     while getopts ":f:hnr" opt; do
         case "${opt}" in
             f) wall=${OPTARG}
                 ;;
-            h) 
+            h)
                 return 0
                 ;;
             n) noX=true
@@ -47,7 +46,7 @@ function __sfp-dims() {
     # Use current wallpaper on no args
     if [[ -z "${wall}" ]]; then
         echo "${subName}: Using current wallpaper." > /dev/stderr
-        wall=$(sfp-get-uri)
+        wall=$(sfp get-uri)
     fi
 
     # Check file exists

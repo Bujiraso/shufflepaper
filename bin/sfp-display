@@ -41,7 +41,7 @@ function __sfp_prefixURI() {
         pfpath="file://""$(readlink -f "${pfpath}")"
     fi
     echo "${pfpath}"
-} 
+}
 export -f __sfp_prefixURI
 
 function __sfp-display() {

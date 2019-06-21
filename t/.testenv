@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+# Hard-code the bin dir here at the start of the path to ensure intercepting of user's config {
+export PROJECT_BIN_PATH=$(readlink -f "$(dirname "${_}")/bin/")
+export PATH="${PROJECT_BIN_PATH}:${PATH}"
+# }
+
+# Intercept specific sfp calls (must precede existing path) {
+export MOCK_BIN_PATH=$(mktemp -d)
+mkdir -p "${MOCK_BIN_PATH}"
+export PATH="${MOCK_BIN_PATH}/:${PATH}"
+# }
+
+# Set up mock data home dir {
+export XDG_DATA_HOME=/tmp/sfp-test-logs/
+mkdir -p "${XDG_DATA_HOME}/shufflepaper"
+# }
+
+# =======  Test Helpers {
+# Logs test case count
+i=0
+function logNewTest() {
+    i=$((i + 1)) && echo "Executing test ${i}: ${1}"
+}
+export -f logNewTest
+
+tests=
+function add() {
+    tests="${tests} ${1}"
+}
+export -f add
+
+function testRunner() {
+    retVal=
+    for test in ${tests};  do
+        logNewTest "${test}" && "${test}" && continue
+        retVal=${?}
+        echo "=== FAILURE: '${test}' test failed (return value ${retVal})"
+    done
+    exit ${retVal}
+}
+export -f testRunner
+
+
+function mock() {
+    export mockScript="${MOCK_BIN_PATH}/sfp-${1}"
+    contents=${2:-echo ${1} called}
+    cat > "${mockScript}" <<EOS
+#!/usr/bin/env bash
+function sfp-${1}() {
+    ${contents}
+}
+EOS
+    chmod +x "${mockScript}"
+}
+export -f mock
+# =======  Test Helpers }

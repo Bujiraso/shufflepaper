@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# test-runner
+
+name=test-runner
+TEST_DIR="$(readlink -f "$(dirname "${0}")/t/")"
+
+if [[ $(env | wc -l) -gt 5 ]]; then
+    echo "ERR: Test environment does not look empty." > /dev/stderr
+    echo "Usage: $ env -i ${name} TEST_CLASS_PATH"
+    echo " or just use ... "
+    echo "Usage: $ ./make test TEST_CLASS_PATH"
+    exit 12
+fi
+
+testClass="$(readlink -f "${1}")" 
+if [[ ! -f "${testClass}" ]]; then
+    echo "Cannot find test class" > /dev/stderr
+    exit 35
+elif [[ ! -x "${testClass}" ]]; then
+    echo "Test class not executable" > /dev/stderr
+    exit 98
+elif [[ "$(readlink -f "$(dirname "${testClass}")")" != "${TEST_DIR}" ]]; then
+    echo "Test not in test directory. Exiting to be safe" > /dev/stderr
+    exit 172
+fi
+
+globalTestEnv="${TEST_DIR}/.testenv"
+if [[ -f "${globalTestEnv}" ]]; then
+    source "${globalTestEnv}"
+else
+    echo "Could not source global test env"
+    exit 209
+fi
+
+testBasename=$(basename "${testClass}")
+specificTestEnv="${TEST_DIR}/.${testBasename}-setup" 
+test -f "${specificTestEnv}" && source "${specificTestEnv}"
+
+echo "Testing class: t/${testBasename}..."
+"${testClass}"
+
+"${TEST_DIR}/.teardown"

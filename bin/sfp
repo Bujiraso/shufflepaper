@@ -28,7 +28,7 @@ function _sfp-err() {
 # Info -> to user and log file
 # Note that until we are not trafficking strings between scripts, we cannot print to stdout
 function _sfp-info() {
-    _sfp-err "${@}" 
+    _sfp-err "${@}"
 }
 
 # Debug -> to log file only
@@ -46,7 +46,7 @@ function __sfp-fe-commands-help() {
 Usage: $(basename "${0}") COMMAND
 
 Available subcommands are:
-$(compgen -c | grep -- '^sfp-[[:alpha:]-]*$' | sort | sed 's/sfp-/, /g;s/^, //' | column -c 80 | sed 's/^/\t/') 
+$(compgen -c | grep -- '^sfp-[[:alpha:]-]*$' | sort | sed 's/sfp-/, /g;s/^, //' | column -c 80 | sed 's/^/\t/')
 EOS
 }
 
@@ -74,7 +74,7 @@ function sfp(){
         return 0
     fi
 
-    # Set up sfp script source 
+    # Set up sfp script source
     command="sfp-$(echo ${1} | sed 's/ /-/g')"
     _sfp-trace "User wants ${command}"
     # Shift to remove subcommand from its own args
@@ -100,8 +100,8 @@ function sfp(){
 [[ ${entryPoint} != ${0} ]] || sfp "${@}"
 
 # Source configuration file if we haven't yet and it exists
-_sfp-trace "Sourcing config"
 if [[ -z ${SFP_CONFIG_SET+x} && -f "${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf" ]]; then
+    _sfp-trace "sfp being sourced -- sourcing config"
    source "${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf"
    export SFP_CONFIG_SET="done"
 fi

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+export height=1920
+export width=1080
+
+# file will simply return a jpg line for anything
+function file() {
+    if [[ ${#} -eq 0 ]]; then
+        return
+    fi
+    jpgString=$(eval "echo \"/tmp/fake/data.jpg: JPEG image data, JFIF standard 1.01, resolution (DPI), density 300x300, segment length 16, baseline, precision 8, ${height}x${width}, components 3\"")
+    echo "${jpgString}"
+}
+export -f file
+
+# get-uri will return a temp file
+mock get-uri "echo $(mktemp)"

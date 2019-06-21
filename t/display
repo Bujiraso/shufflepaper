@@ -1,12 +1,6 @@
 #!/usr/bin/env bash
 # sfp-display test
 
-# Source global test env arg and test class env
-test -f "${1}" && source "${1}" || echo "Could not source test environment" 
-
-# Source specific test env
-source "${0/\/t\///t/.}-setup" || exit 1
-
 # Tests
 uri() {
     # Set up a fake jpg to use
@@ -22,10 +16,4 @@ mode(){
 }
 add mode
 
-export retVal=
-for test in ${tests};  do
-    logNewTest "${test}" && "${test}" && continue
-    retVal=${?} 
-    echo "=== FAILURE: '${test}' test failed (return value ${retVal})" 
-done
-exit ${retVal}
+testRunner

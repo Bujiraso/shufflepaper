@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# sfp-dims test
+
+# Tests
+noArgs_currentWall() {
+    (bash -c "sfp dims" 2>&1) | grep -A 10 current | grep ${height} | grep ${width} > /dev/null
+}
+add noArgs_currentWall
+
+testRunner

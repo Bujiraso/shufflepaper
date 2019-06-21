@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # make file to deploy shufflepaper to a chosen directory
 
-myDir=$(readlink -f $(dirname "${0}"))
+export BASE_DIR=$(readlink -f $(dirname "${0}"))
 install() {
     if [[ ${#} -eq 0 ]]; then
         echo "Usage: make install INSTALL_DIR"
@@ -10,43 +10,42 @@ install() {
 
     installDir="${1}"
 
-    if ! ls "${myDir}/bin/sfp" > /dev/null 2> /dev/null; then
-        echo "make.sh cannot find shuffle paper install files for copying while searching in '${myDir}'. Are the files there?"
+    if ! ls "${BASE_DIR}/bin/sfp" > /dev/null 2> /dev/null; then
+        echo "make.sh cannot find shuffle paper install files for copying while searching in '${BASE_DIR}'. Are the files there?"
         exit 1
     fi
 
     # Install all sfp scripts to the install dir as executables
-    install -Dm 755 -t "${installDir}" "${myDir}"/bin/sfp*
+    install -Dm 755 -t "${installDir}" "${BASE_DIR}"/bin/sfp*
 }
 
 function test() {
     # Test Range is the files to test
     testRange="${1}"
 
-    testEnv="${myDir}/.testenv"
-
-    for testFile in ${testRange:-"${myDir}"/t/*}; do
+    for testFile in ${testRange:-"${BASE_DIR}"/t/*}; do
         # Skip directories and test env's
         if [[  -d "${testFile}" || ! -x "${testFile}" ]]; then
             continue
         fi
 
-        echo "Testing class: $(basename "${testFile}") ... "
-        env -i "$(readlink -f "${testFile}")" "${testEnv}"
+        env -i "${BASE_DIR}/test-runner" "${testFile}"
         testResult=${?}
         if [[ ${testResult} -ne 0 ]]; then
             echo "== TESTS FAILED ==" > /dev/stderr
             echo "The failed test class is t/$(basename "${testFile}")" > /dev/stderr
             return ${testResult}
+        else
+            echo
         fi
-        echo
     done
     echo "== TESTS PASS =="
 }
 
 # Main logic {
 if [[ ${#} -eq 0 ]];then
-    echo "Usage: ${0} (install INSTALL_DIR|test)"
+    echo "Usage: ${0} install INSTALL_DIR"
+    echo "Usage: ${0} test [TEST_CLASSES]"
     exit 0
 fi
 

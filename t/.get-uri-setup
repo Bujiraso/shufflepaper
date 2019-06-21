@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# pgrep interceptor
+function pgrep() {
+    return -1
+}
+export -f pgrep
