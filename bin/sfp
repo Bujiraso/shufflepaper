@@ -97,11 +97,11 @@ function sfp(){
     return ${retVal}
 }
 
-[[ ${entryPoint} != ${0} ]] || sfp "${@}"
-
 # Source configuration file if we haven't yet and it exists
 if [[ -z ${SFP_CONFIG_SET+x} && -f "${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf" ]]; then
     _sfp-trace "sfp being sourced -- sourcing config"
    source "${XDG_CONFIG_HOME}/shufflepaper/shufflepaper.conf"
    export SFP_CONFIG_SET="done"
 fi
+
+[[ ${entryPoint} != ${0} ]] || sfp "${@}"
