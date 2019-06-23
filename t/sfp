@@ -21,7 +21,7 @@ mockExtensionsMustWork() {
     # Sub commands (extensions) must be callable
     testSubc="/tmp/sfp-test/sfp-test"
     mkdir -p "$(dirname "${testSubc}")"
-    cat >> ${testSubc} <<EOS
+    cat > ${testSubc} <<EOS
 #!/usr/bin/env bash
 function sfp-test() {
     echo Tests are magic
@@ -31,3 +31,26 @@ EOS
     bash -c "export 'PATH=${PATH}:$(dirname "${testSubc}")'; sfp test"  | grep magic > /dev/null
 }
 add mockExtensionsMustWork
+
+# Also indirectly tests sourcing of global config
+subcommandsReceiveUserConfigFile() {
+    # Set up subcommand {
+    testSubc="/tmp/sfp-test/sfp-test"
+    mkdir -p "$(dirname "${testSubc}")"
+    cat > ${testSubc} <<EOS
+#!/usr/bin/env bash
+function sfp-test() {
+    echo \${TEST_USER_VAR}
+}
+EOS
+    chmod +x "${testSubc}"
+    # }
+    # Set up signal var in shufflepaper.conf
+    cat > ${XDG_CONFIG_HOME}/shufflepaper/user.conf <<EOS
+#!/usr/bin/env bash
+export TEST_USER_VAR="nice 2 meet u, i'm a signal value"
+EOS
+    
+    bash -c "export 'PATH=${PATH}:$(dirname "${testSubc}")'; sfp test" | grep 'signal' > /dev/null
+}
+add subcommandsReceiveUserConfigFile

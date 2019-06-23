@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 # Hard-code the bin dir here at the start of the path to ensure intercepting of user's config {
-export PROJECT_BIN_PATH=$(readlink -f "$(dirname "${_}")/bin/")
+export PROJECT_PATH=$(readlink -f "$(dirname "${_}")")
+export PROJECT_BIN_PATH="${PROJECT_PATH}/bin/"
 export PATH="${PROJECT_BIN_PATH}:${PATH}"
 # }
 
@@ -11,9 +12,14 @@ mkdir -p "${MOCK_BIN_PATH}"
 export PATH="${MOCK_BIN_PATH}/:${PATH}"
 # }
 
-# Set up mock data home dir {
+# Set up mock XDG dir's {
 export XDG_DATA_HOME=/tmp/sfp-test-logs/
+rm -rf "${XDG_DATA_HOME}/shufflepaper"
 mkdir -p "${XDG_DATA_HOME}/shufflepaper"
+export XDG_CONFIG_HOME=/tmp/sfp-test-config/
+rm -rf "${XDG_CONFIG_HOME}/shufflepaper"
+mkdir -p "${XDG_CONFIG_HOME}/shufflepaper"
+cp -f "${PROJECT_PATH}/conf/shufflepaper.conf" "${XDG_CONFIG_HOME}/shufflepaper"
 # }
 
 function add() {
