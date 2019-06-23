@@ -85,6 +85,10 @@ function __sfp-option() {
         noUpdate=1
         shift
     fi
+    if [[ ${#} -ne 1 ]]; then
+        _sfp-err "${subName}: --option argument requires only one argument, received $(($# - 1))"
+        return 2
+    fi
 
     mode=${1}
     case "${mode}" in
@@ -114,10 +118,6 @@ function sfp-display () {
 
     if [[ "${1}" == "-o" || "${1}" == "--option" ]]; then
         _sfp-trace "Received '-o' switch"
-        if [[ ${#} -ne 2 ]]; then
-            _sfp-err "${subName}: --option argument requires only one argument, received $(($# - 1))"
-            return 2
-        fi
         shift # remove subcommand from its own args
         __sfp-option "${@}"
     elif [[ "${1}" == "-h" || "${1}" == "--help" ]]; then

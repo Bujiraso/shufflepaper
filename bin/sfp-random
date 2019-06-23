@@ -35,16 +35,12 @@ function __sfp-random() {
         return 1
     else
         if [[ -f "${wall}" ]]; then
-            sfp change "${wall}"
-            if [[ -z "${viewMode}" ]]; then
-                DISPLAY=:0 sfp option "scaled"
-            else
-                DISPLAY=:0 sfp option "${viewMode}"
-            fi
+            sfp display "${wall}"
+            DISPLAY=:0 sfp display --option --no-update "${viewMode:-scaled}"
         else
             location=$(find "${wallDir}" -inum "${inode}")
             if [[ -f "${location}" ]]; then
-                sfp change "${location}"
+                sfp display "${location}"
             else
                 "Could not find wallpaper ${inode} at ${wall}. Please locate and update the database."
                 return 5
