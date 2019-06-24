@@ -32,5 +32,3 @@ function pgrep() {
     fi
 }
 export -f pgrep
-
-mock alter

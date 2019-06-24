@@ -21,7 +21,7 @@ subName="display"
 function __sfp-display-help() {
     OPTIONS="centered scaled spanned zoom stretched wallpaper"
     cat <<EOS
-Usage: sfp ${subName} FILE                   Set the wallpaper to the given file
+Usage: sfp ${subName} FILE (OPTION)          Set the wallpaper to the given file
        sfp ${subName} (-o|--option) OPTION   Set the view mode of the wallpaper
            Argument can be one of: ${OPTIONS}
        sfp ${subName} (-h|--help)            Print this help message
@@ -74,31 +74,20 @@ function __sfp-update-gnome-display-mode() {
 }
 
 function __sfp-option() {
-    _sfp-trace "Checking for extra hidden args"
-    if [[ "${1}" == "-n" || "${1}" == "--no-update" ]]; then
-        _sfp-trace "Found hidden arg for --no-update."
-        noUpdate=1
-        shift
-    fi
     if [[ ${#} -ne 1 ]]; then
         _sfp-err "${subName}: --option argument requires only one argument, received $(($# - 1))"
         return 2
     fi
+    option=${1}
+    shift
 
-    mode=${1}
-    case "${mode}" in
+    test ! -z ${option+set} && case "${option}" in
         "centered"|"scaled"|"spanned"|"zoom"|"stretched"|"wallpaper")
-            _sfp-trace "Requesting DE (currently gnome...) to update display to ${mode}"
-            __sfp-update-gnome-display-mode "${mode}"
-            if [[ -z "${noUpdate}" ]]; then
-                _sfp-trace "Updating database"
-                sfp alter -m "${mode}"
-            else
-                _sfp-trace "Skipping database update due to -n switch"
-            fi
+            _sfp-trace "Requesting DE (currently gnome...) to update display to ${option}"
+            __sfp-update-gnome-display-mode "${option}"
             ;;
         *) #Invalid view option
-            echo "${subName}: Invalid argument - ${mode}" >&2
+            echo "${subName}: Invalid argument - ${option}" >&2
             return 1
             ;;
     esac
@@ -121,21 +110,47 @@ function sfp-display () {
         __sfp-display-help
         return 1
     fi
-
-    if [[ "${1}" == "-o" || "${1}" == "--option" ]]; then
-        _sfp-trace "Received '-o' switch"
-        shift # remove subcommand from its own args
-        __sfp-option "${@}"
-    elif [[ "${1}" == "-h" || "${1}" == "--help" ]]; then
+    if [[ ${#} -gt 2 ]]; then
+        echo "Invalid arguments"
         __sfp-display-help
-    else
-        wall=$(__sfp-validate-file "${1}")
-        validAns=${?}
-        if [[ ${validAns} -ne 0 ]]; then
-            return ${validAns}
-        fi
-        _sfp-trace "Setting wallpaper to ${wall}"
-        __sfp-display "${wall}"
+        return 2
     fi
-    return 0
+
+    while true; do 
+        case "${1}" in 
+            -h | --help ) 
+                __sfp-display-help
+                return 0
+                ;;
+            -o | --option )
+                __sfp-option "${2}"
+                return ${?}
+                ;;
+            -- )
+                shift
+                break
+                ;;
+            * )
+                break
+                ;;
+        esac
+    done
+
+    # Set wall {
+    wall=$(__sfp-validate-file "${1}")
+    validAns=${?}
+    if [[ ${validAns} -ne 0 ]]; then
+        return ${validAns}
+    else
+        shift
+    fi
+    _sfp-trace "Requesting wallpaper display for '${wall}'"
+    __sfp-display "${wall}"
+    displayAns=${?}
+    if [[ ${displayAns} -ne 0 ]];then
+        return ${displayAns}
+    fi
+    # }
+
+    test ! -z ${1+set} && __sfp-option "${1}"
 }

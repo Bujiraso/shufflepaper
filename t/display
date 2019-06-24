@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 # sfp-display test
 
+# Set up a fake jpg to use {
+testjpg="/tmp/sfp-test/fake.jpg"
+mkdir -p $(dirname "${testjpg}")
+dd if=/dev/urandom of="${testjpg}" bs=512 count=2 2> /dev/null
+# }
+
 # Tests
 uri() {
-    # Set up a fake jpg to use
-    testjpg="/tmp/sfp-test/fake.jpg"
-    mkdir -p $(dirname "${testjpg}")
-    dd if=/dev/urandom of="${testjpg}" bs=512 count=2 2> /dev/null
     bash -c "sfp display \"${testjpg}\"" | grep "${uriTestPass}" > /dev/null
 }
 add uri
@@ -15,3 +17,8 @@ mode(){
     bash -c "sfp display -o zoom" | grep "${optTestPass}" > /dev/null
 }
 add mode
+
+uriAndMode() {
+    bash -c "sfp display \"${testjpg}\" zoom" | grep -A 3 "${uriTestPass}" | grep "${optTestPass}" > /dev/null
+}
+add uriAndMode
