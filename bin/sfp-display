@@ -29,20 +29,15 @@ EOS
 }
 
 #Check that the file is prefixed by "file://"
-function __sfp_prefixURI() {
+function __sfp_prefix-uri() {
     pfpath="${1}"
-    _sfp-trace "Prepending file:// to ${pfpath}"
-    if [[ ! -f  "$(echo "${pfpath##*:\/\/}" | sed s/^\'// | sed s/\'$//)" ]]; then
-        echo >&2 "${subName}: File \"${pfpath}\" does not exist"
-        return 2
-    fi
-
     if [[ ! "${pfpath}" = *"file://"* ]]; then
+        _sfp-trace "Prepending file:// to ${pfpath}"
         pfpath="file://""$(readlink -f "${pfpath}")"
     fi
     echo "${pfpath}"
 }
-export -f __sfp_prefixURI
+export -f __sfp_prefix-uri
 
 function __sfp-display() {
     fpath="${1}"
@@ -50,7 +45,7 @@ function __sfp-display() {
     # Determine desktop session and change wallpaper
     if pgrep cinnamon > /dev/null; then
         _sfp-trace "Setting cinnamon background"
-        pfpath=$(__sfp_prefixURI "${fpath}")
+        pfpath=$(__sfp_prefix-uri "${fpath}")
         # TODO: This won't always be DISPLAY=:0
         DISPLAY=:0 gsettings set org.cinnamon.desktop.background picture-uri "${pfpath}"
     elif pgrep mate-session > /dev/null; then
@@ -61,7 +56,7 @@ function __sfp-display() {
         if [[ -z ${DBUS_SESSION_BUS_ADDRESS+x} ]]; then
             export $(dbus-launch --return-with-session gnome-session)
         fi
-        pfpath=$(__sfp_prefixURI "${fpath}")
+        pfpath=$(__sfp_prefix-uri "${fpath}")
         DISPLAY=:0 gsettings set org.gnome.desktop.background picture-uri "${pfpath}"
     else
         echo >&2 "${subName}: Cannot read for session ${DESKTOP_SESSION}"
@@ -109,6 +104,17 @@ function __sfp-option() {
     esac
 }
 
+function __sfp-validate-file() {
+    _sfp-trace "Validating file exists"
+    fpath=${1}
+    if [[ ! -f  "$(echo "${fpath##*:\/\/}" | sed s/^\'// | sed s/\'$//)" ]]; then
+        echo >&2 "${subName}: File \"${fpath}\" does not exist"
+        return 2
+    else
+        echo $(readlink -f "${fpath}")
+    fi
+}
+
 function sfp-display () {
     if [[ ${#} -eq 0 ]]; then
         echo >&2 "${subName}: No args given. Exiting without change."
@@ -123,8 +129,13 @@ function sfp-display () {
     elif [[ "${1}" == "-h" || "${1}" == "--help" ]]; then
         __sfp-display-help
     else
-        _sfp-trace "Attempting to set wallpaper to ${@}"
-        __sfp-display "${@}"
+        wall=$(__sfp-validate-file "${1}")
+        validAns=${?}
+        if [[ ${validAns} -ne 0 ]]; then
+            return ${validAns}
+        fi
+        _sfp-trace "Setting wallpaper to ${wall}"
+        __sfp-display "${wall}"
     fi
     return 0
 }
