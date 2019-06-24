@@ -94,13 +94,15 @@ function __sfp-option() {
 }
 
 function __sfp-validate-file() {
-    _sfp-trace "Validating file exists"
     fpath=${1}
-    if [[ ! -f  "$(echo "${fpath##*:\/\/}" | sed s/^\'// | sed s/\'$//)" ]]; then
-        echo >&2 "${subName}: File \"${fpath}\" does not exist"
+    _sfp-trace "Validating file '${fpath}' exists"
+    wall=$(readlink -f "${fpath}")
+    if [[ ${?} -ne 0 || ! -f "${wall}" ]]; then
+        echo >&2 "${subName}: Could not find file for path: \"${fpath}\""
         return 2
     else
-        echo $(readlink -f "${fpath}")
+        _sfp-trace "Validated"
+        echo ${wall}
     fi
 }
 
@@ -109,9 +111,8 @@ function sfp-display () {
         echo >&2 "${subName}: No args given. Exiting without change."
         __sfp-display-help
         return 1
-    fi
-    if [[ ${#} -gt 2 ]]; then
-        echo "Invalid arguments"
+    elif [[ ${#} -gt 2 ]]; then
+        echo "Received too many arguments (${#})"
         __sfp-display-help
         return 2
     fi
