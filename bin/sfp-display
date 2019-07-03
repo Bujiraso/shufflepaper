@@ -131,6 +131,10 @@ function sfp-display () {
                 shift
                 break
                 ;;
+            -*)
+                echo "Omitting invalid argument '${1}'"
+                shift
+                ;;
             * )
                 break
                 ;;
