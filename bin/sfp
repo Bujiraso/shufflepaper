@@ -89,7 +89,7 @@ function sfp(){
     _sfp-trace "Sourcing ${command}"
     source "${command}"
 
-    _sfp-trace "Running '${command}' '"${@}"'"
+    _sfp-trace "Running '${command} "${@}"'"
     ${command} "${@}"
     retVal="${?}"
 

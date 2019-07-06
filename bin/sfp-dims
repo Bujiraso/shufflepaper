@@ -29,18 +29,28 @@ Usage: ${subName} [OPTION]
 EOS
 }
 function __sfp-dims() {
-    while getopts ":f:hnr" opt; do
-        case "${opt}" in
-            f) wall=${OPTARG}
+    while true; do
+        case "${1}" in
+            -f) 
+                shift
+                wall=${1}
                 ;;
-            h)
+            -h)
+                __dims-help
                 return 0
                 ;;
-            n) noX=true
+            -n) noX=true
                 ;;
-            r) ratio=true
+            -r) ratio=true
+                ;;
+            -*)
+                echo "Omitting invalid argument '${1}'"
+                ;;
+            *)
+                break
                 ;;
         esac
+        shift
     done
 
     # Use current wallpaper on no args

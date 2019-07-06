@@ -67,24 +67,37 @@ EOS
 }
 
 function __sfp-stats() {
-
-    while getopts ":df:hn" opt; do
-        case "${opt}" in
-            "d") delimiter=true
+    while true; do
+        case "${1}" in
+            -d) delimiter=true
                 ;;
-            "f") wallArg="$(readlink -f "${OPTARG}")"
+            -f)
+                shift
+                wallArg="$(readlink -f "${1}")"
                 ;;
-            "h")
+            -h)
                 __sfp-stats-help
                 return 0
                 ;;
-            "n") noheader=true
+            -n) noheader=true
+                ;;
+            --)
+                break
+                ;;
+            -*)
+                _sfp-err "Omitting unknown arg ${1}"
+                ;;
+            *)
+                break
                 ;;
         esac
+        shift
     done
+    _sfp-trace "delimiter=${delimiter} ; noheader=${noheader}"
     output="$(__sfp-stats-readDB "${wallArg}")"
     ret=${?}
     if [[ "${ret}" -eq 0 ]]; then
+        _sfp-trace "db response: ${output}"
         if [[ -z "${delimiter}" ]]; then
             echo "${output}" | column -s\| -t
         else

@@ -108,7 +108,7 @@ function __sfp-miner() {
         while read line; do
             change=true
             sfp get-sql-stmt "${line}" >> "${txnFile}"
-        done <<< "$(find "${wallDir}" -newer "${SFP_DATABASE_FILE}" -type f \( -name "*png" -o -name "*jpg" \) -printf "%i\n" | sort)"
+        done <<< "$(find "${wallDir}" -newer "$(sfp query --print-db)" -type f \( -name "*png" -o -name "*jpg" \) -printf "%i\n" | sort)"
 
         if ! "${change}"; then
             _sfp-dbug "${subName}: $(date +%D.%T) No changes to wallpapers detected."

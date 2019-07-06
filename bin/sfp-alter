@@ -38,6 +38,7 @@ EOS
 }
 
 function __sfp-alter() {
+    sqlChanges=
     wallURI=$(sfp get-uri)
 
     # The file needs to be asserted first, out of all the arguments
@@ -58,9 +59,8 @@ function __sfp-alter() {
     done
 
     #Get inode so that if /anything/ else changes we can still update
-    inode=$(sfp stats -n -f "${wallURI}" | cut -d ' ' -f 1)
-
-    if [[ "${#}" -ne 0 && -z "${inode}" ]]; then
+    inode=$(sfp stats -d -n -f "${wallURI}" | cut -d'|' -f 1)
+    if [[ "${?}" -ne 0 && -z "${inode}" ]]; then
         echo "${subName}: Fatal error: no inode found for ${wallURI}" >&2
         return 4
     fi
@@ -78,17 +78,18 @@ function __sfp-alter() {
         fi
     fi
 
-    while getopts ":a:c:df:hm:p:s:t:u:v:" opt; do
-        case "${opt}" in
-            "a")
+    while true; do
+        case "${1}" in
+            -a)
                 comments="$(sfp query "SELECT user_comments FROM Wallpapers WHERE inode=${inode}")"
                 if [[ -z "${sqlChanges}" ]]; then
                     comments=","
                 fi
-                comments=",${OPTARG}"
+                shift
+                comments=",${1}"
                 sqlChanges="${sqlChanges}"" user_comments = \"${comments}\","
                 ;;
-            "d")
+            -d)
                 dims=($(sfp dims -n -f "${wallURI}"))
                 if [[ ${dims[0]} -eq 0 || ${dims[1]} -eq 0 ]]; then
                     echo "${subName}: Cannot get dimensions for ${wallURI}." >&2
@@ -96,12 +97,18 @@ function __sfp-alter() {
                 fi
                 sqlChanges="${sqlChanges}"" width = ${dims[0]}, height = ${dims[1]},"
                 ;;
-            "h")
+            -f)
+                # already set above. skip
+                shift
+                ;;
+            -h)
                 __alter-help
                 return 0
                 ;;
-            "m")
+            -m)
                 OPTIONS="centered scaled spanned zoom stretched wallpaper"
+                shift
+                OPTARG="${1}"
                 if [[ "${OPTARG}" == - ]]; then
                     select choice in ${OPTIONS}; do
                         sqlChanges="${sqlChanges}"" view_mode =\"${choice}\","
@@ -119,10 +126,14 @@ function __sfp-alter() {
                     esac
                 fi
                 ;;
-            "p")
+            -p)
+                shift
+                OPTARG="${1}"
                 sqlChanges="${sqlChanges}"" file_path = ${OPTARG},"
                 ;;
-            "s")
+            -s)
+                shift
+                OPTARG="${1}"
                 if [[ "${OPTARG}" =~ ^[1-5]$ || "${OPTARG}" == "NULL" ]]; then
                     sqlChanges="${sqlChanges}"" star_rating = ${OPTARG},"
                 else
@@ -130,7 +141,9 @@ function __sfp-alter() {
                     return 10
                 fi
                 ;;
-            "t")
+            -t)
+                shift
+                OPTARG="${1}"
                 case "${OPTARG}" in
                     "0"|"false"|"off"|"f"|"no"|"F"|"unselected") sel=0 ;;
                     "1"|"true"|"on"|"t"|"yes"|"T"|"selected") sel=1 ;;
@@ -140,7 +153,9 @@ function __sfp-alter() {
                 esac
                 sqlChanges="${sqlChanges}"" selected = ${sel},"
                 ;;
-            "u")
+            -u)
+                shift
+                OPTARG="${1}"
                 if [[ "${OPTARG}" == "-" ]]; then
                     tempFile="/tmp/alterWallInDB.$(date +%s).comments"
                     sfp query "SELECT user_comments FROM Wallpapers WHERE inode=${inode}" > ${tempFile}
@@ -151,7 +166,9 @@ function __sfp-alter() {
                     sqlChanges="${sqlChanges}""user_comments = \"${OPTARG}\","
                 fi
                 ;;
-            "v")
+            -v)
+                shift
+                OPTARG="${1}"
                 if [[ "${OPTARG}" =~ ^[0-9]+$ ]];then
                     sqlChanges="${sqlChanges}"" view_count = ${OPTARG},"
                 else
@@ -159,15 +176,15 @@ function __sfp-alter() {
                     return 9
                 fi
                 ;;
-            \?) # Invalid option
-                echo "${subName}: Invalid option -${OPTARG}" >&2
+            -*) # Invalid option
+                echo "${subName}: Invalid option ${1}" >&2
                 return 1
                 ;;
-            :)
-                echo "${subName}: Option -${OPTARG} requires an argument." >&2
-                return 2
+            *)
+                break
                 ;;
         esac
+        shift
     done
 
     if [[ ! -z "${sqlChanges}" ]]; then
