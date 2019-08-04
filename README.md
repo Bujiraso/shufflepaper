@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Bujiraso/shufflepaper.svg?branch=master)](https://travis-ci.org/Bujiraso/shufflepaper)
+[![Build Status](https://travis-ci.com/Bujiraso/shufflepaper.svg?branch=master)](https://travis-ci.com/Bujiraso/shufflepaper)
 # ShufflePaper v0.5
 by Bujiraso, licensed under GPLv3 or later (see COPYING)
 
